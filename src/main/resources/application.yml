@@ -23,3 +23,7 @@ spring:
   h2:
     console:
       enabled: true
+  
+  config:
+    import:
+      - application-security.yml
