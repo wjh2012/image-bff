@@ -17,8 +17,8 @@ class AuthController(
 
     @PostMapping("/register")
     @Operation(summary = "회원가입", description = "사용자 회원가입을 진행한다.")
-    fun register(registerRequest: RegisterRequest): ResponseEntity<RegisterResponse> {
-        authService.registerUser(registerRequest.email, registerRequest.password)
+    fun normalRegister(registerRequest: RegisterRequest): ResponseEntity<RegisterResponse> {
+        authService.registerNormalUser(registerRequest.name, registerRequest.email, registerRequest.password)
         return ResponseEntity.ok(RegisterResponse(true))
     }
 

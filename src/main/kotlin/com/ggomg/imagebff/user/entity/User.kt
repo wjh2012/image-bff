@@ -11,10 +11,17 @@ data class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
+    @Column(name="name", nullable = false)
+    val name: String,
+    
     @Column(name="email", nullable = false, unique = true)
     val email: String,
     
     @Column(name="password", nullable = false)
     val password: String,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "auth_type", nullable = false)
+    val authType: AuthType
     
 ) : BaseEntity()

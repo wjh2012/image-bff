@@ -1,6 +1,7 @@
 package com.ggomg.imagebff.user.service
 
 interface AuthService {
-
-    fun registerUser(email: String, password: String)
+    
+    fun registerNormalUser(name: String, email: String, password: String)
+    
 }
