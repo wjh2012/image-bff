@@ -60,3 +60,12 @@ allOpen {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+tasks.register<Copy>("copyConfig") {
+    from("config/")
+    into("src/main/resources/")
+}
+
+tasks.named("processResources") {
+    dependsOn("copyConfig")
+}
