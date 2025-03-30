@@ -10,14 +10,20 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @DataJpaTest
-class UserRepositoryTest @Autowired constructor(
+class UserRepositoryTest(
+    @Autowired
     val userRepository: UserRepository
 ) {
-    
+
     @Test
     fun `이메일 중복확인 테스트`() {
         // given
-        val user = User(name = "kim", email = "hello@gmail.com", password = "password", authType = AuthType.NORMAL)
+        val user = User(
+            name = "kim",
+            email = "hello@gmail.com",
+            password = "password",
+            authType = AuthType.NORMAL
+        )
         userRepository.save(user)
 
         // when
@@ -26,12 +32,17 @@ class UserRepositoryTest @Autowired constructor(
         // then
         assertNotNull(isExistsByEmail)
         assertTrue(isExistsByEmail)
-    } 
-    
+    }
+
     @Test
     fun `user 저장 후 이메일로 조회`() {
         // given
-        val user = User(name = "kim", email = "hello@gmail.com", password = "password", authType = AuthType.NORMAL)
+        val user = User(
+            name = "kim",
+            email = "hello@gmail.com",
+            password = "password",
+            authType = AuthType.NORMAL
+        )
         userRepository.save(user)
 
         // when
