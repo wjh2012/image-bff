@@ -1,9 +1,10 @@
 package com.ggomg.imagebff.user.service
 
 import BusinessException
-import com.ggomg.imagebff.common.jwt.JwtService
+import com.ggomg.imagebff.common.jwt.JwtTokenService
 import com.ggomg.imagebff.user.entity.AuthType
 import com.ggomg.imagebff.user.entity.User
+import com.ggomg.imagebff.user.entity.UserRole
 import com.ggomg.imagebff.user.exception.UserErrorCode
 import com.ggomg.imagebff.user.model.login.LoginRequest
 import com.ggomg.imagebff.user.model.login.LoginResponse
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Service
 class AuthServiceImpl(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtService: JwtService,
+    private val jwtTokenService: JwtTokenService,
 ) : AuthService {
 
     override fun register(registerRequest: RegisterRequest): RegisterResponse {
@@ -26,7 +27,8 @@ class AuthServiceImpl(
             name = registerRequest.name,
             email = registerRequest.email,
             password = encodedPassword,
-            authType = AuthType.NORMAL
+            authType = AuthType.NORMAL,
+            userRole = UserRole.ROLE_USER
         );
         userRepository.save(user)
 

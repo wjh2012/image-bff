@@ -4,6 +4,7 @@ import BusinessException
 import com.ggomg.imagebff.common.jwt.JwtTokenService
 import com.ggomg.imagebff.user.entity.AuthType
 import com.ggomg.imagebff.user.entity.User
+import com.ggomg.imagebff.user.entity.UserRole
 import com.ggomg.imagebff.user.exception.UserErrorCode
 import com.ggomg.imagebff.user.model.login.LoginRequest
 import com.ggomg.imagebff.user.repository.UserRepository
@@ -45,7 +46,8 @@ class AuthServiceImplTest {
             name = "홍길동",
             email = "test@example.com",
             password = "encodedPwd",
-            authType = AuthType.NORMAL
+            authType = AuthType.NORMAL,
+            userRole = UserRole.ROLE_USER
         )
 
         every { userRepository.findByEmail(request.email) } returns user
@@ -75,7 +77,7 @@ class AuthServiceImplTest {
     fun `비밀번호 틀릴 경우 예외 발생`() {
         // given
         val request = LoginRequest(email = "test@example.com", password = "wrongpass")
-        val user = User(1L, "홍길동", "test@example.com", "encodedPwd", AuthType.NORMAL)
+        val user = User(1L, "홍길동", "test@example.com", "encodedPwd", AuthType.NORMAL, UserRole.ROLE_USER)
 
         every { userRepository.findByEmail(request.email) } returns user
         every { passwordEncoder.matches(request.password, user.password) } returns false
