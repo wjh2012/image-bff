@@ -16,13 +16,13 @@ class JwtTokenTokenServiceImpl(
 ) :
     JwtTokenService {
 
-    override fun generateToken(): String {
+    override fun generateToken(email: String): String {
         val now = Instant.now()
         val claims = JwtClaimsSet.builder()
             .issuer("ggomg")
             .issuedAt(now)
             .expiresAt(now.plusSeconds(3600))
-            .subject("user-id")
+            .subject(email)
             .build()
 
         val jwsHeader = jwtHeaderStrategy.getJwsHeader()
@@ -35,6 +35,15 @@ class JwtTokenTokenServiceImpl(
             true
         } catch (e: Exception) {
             false
+        }
+    }
+
+    override fun getEmailFromToken(token: String): String {
+        return try {
+            val decodedJwt = jwtDecoder.decode(token)
+            decodedJwt.claims["sub"]?.toString() ?: throw IllegalArgumentException("Email claim not found in token.")
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Invalid token.")
         }
     }
 }

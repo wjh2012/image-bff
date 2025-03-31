@@ -25,6 +25,8 @@ class JwtTokenServiceImplMockTest {
     @Test
     fun `JWT 토큰 생성 성공`() {
         // given
+        val email = "test@example.com"
+
         val mockJwt = mockk<Jwt>()
         every { mockJwt.tokenValue } returns "mocked-token"
         every { jwtEncoder.encode(any()) } returns mockJwt
@@ -32,7 +34,7 @@ class JwtTokenServiceImplMockTest {
                 JwsHeader.with(SignatureAlgorithm.RS256).build()
 
         // when
-        val token = jwtService.generateToken()
+        val token = jwtService.generateToken(email)
 
         // then
         assertEquals("mocked-token", token)

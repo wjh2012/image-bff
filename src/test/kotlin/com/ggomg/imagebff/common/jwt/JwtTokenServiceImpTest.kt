@@ -17,6 +17,8 @@ class JwtTokenServiceImpTest {
 
     @Test
     fun `JWT 토큰 생성-검증 성공`() {
+        val email = "test@example.com"
+
         // RSA 키쌍
         val keyPair = KeyPairGenerator.getInstance("RSA").apply { initialize(2048) }.genKeyPair()
         val publicKey = keyPair.public as RSAPublicKey
@@ -44,7 +46,7 @@ class JwtTokenServiceImpTest {
         val service = JwtTokenTokenServiceImpl(encoder, decoder, headerStrategy)
 
         // 토큰 생성 및 검증
-        val token = service.generateToken()
+        val token = service.generateToken(email)
         assertTrue(service.validateToken(token))
     }
 }

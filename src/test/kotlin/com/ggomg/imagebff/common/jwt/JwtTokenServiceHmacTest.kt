@@ -19,15 +19,25 @@ class JwtTokenServiceHmacTest(
 
     @Test
     fun `JWT 토큰 생성 성공`() {
-        val token = jwtTokenService.generateToken()
+        val email = "test@example.com"
+        val token = jwtTokenService.generateToken(email)
         println("발급된 토큰: $token")
         assertNotNull(token)
         assertTrue(token.isNotBlank())
     }
 
     @Test
+    fun `토큰 이메일 파싱 성공`() {
+        val email = "test@example.com"
+        val token = jwtTokenService.generateToken(email)
+        val result = jwtTokenService.getEmailFromToken(token)
+        assertEquals(email, result)
+    }
+
+    @Test
     fun `정상 토큰 검증 성공`() {
-        val token = jwtTokenService.generateToken()
+        val email = "test@example.com"
+        val token = jwtTokenService.generateToken(email)
         val result = jwtTokenService.validateToken(token)
         assertTrue(result)
     }
