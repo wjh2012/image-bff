@@ -13,7 +13,7 @@ import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
 
-class JwtServiceImpTest {
+class JwtTokenServiceImpTest {
 
     @Test
     fun `JWT 토큰 생성-검증 성공`() {
@@ -41,7 +41,7 @@ class JwtServiceImpTest {
         }
 
         // 실제 서비스 인스턴스
-        val service = JwtServiceImpl(encoder, decoder, headerStrategy)
+        val service = JwtTokenTokenServiceImpl(encoder, decoder, headerStrategy)
 
         // 토큰 생성 및 검증
         val token = service.generateToken()

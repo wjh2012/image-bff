@@ -7,19 +7,19 @@ import org.junit.jupiter.api.Assertions.*
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm
 import org.springframework.security.oauth2.jwt.*
 
-class JwtServiceImplMockTest {
+class JwtTokenServiceImplMockTest {
 
     private lateinit var jwtEncoder: JwtEncoder
     private lateinit var jwtDecoder: JwtDecoder
     private lateinit var jwtHeaderStrategy: JwtHeaderStrategy
-    private lateinit var jwtService: JwtServiceImpl
+    private lateinit var jwtService: JwtTokenTokenServiceImpl
 
     @BeforeEach
     fun setUp() {
         jwtEncoder = mockk()
         jwtDecoder = mockk()
         jwtHeaderStrategy = mockk()
-        jwtService = JwtServiceImpl(jwtEncoder, jwtDecoder, jwtHeaderStrategy)
+        jwtService = JwtTokenTokenServiceImpl(jwtEncoder, jwtDecoder, jwtHeaderStrategy)
     }
 
     @Test

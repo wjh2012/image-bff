@@ -1,7 +1,7 @@
 package com.ggomg.imagebff.user.service
 
 import BusinessException
-import com.ggomg.imagebff.common.jwt.JwtService
+import com.ggomg.imagebff.common.jwt.JwtTokenService
 import com.ggomg.imagebff.user.entity.AuthType
 import com.ggomg.imagebff.user.entity.User
 import com.ggomg.imagebff.user.exception.UserErrorCode
@@ -27,13 +27,13 @@ class AuthServiceImplTest {
     lateinit var passwordEncoder: PasswordEncoder
 
     @MockK
-    lateinit var jwtService: JwtService
+    lateinit var jwtTokenService: JwtTokenService
 
     lateinit var authService: AuthServiceImpl
 
     @BeforeEach
     fun setUp() {
-        authService = AuthServiceImpl(userRepository, passwordEncoder, jwtService)
+        authService = AuthServiceImpl(userRepository, passwordEncoder, jwtTokenService)
     }
 
     @Test

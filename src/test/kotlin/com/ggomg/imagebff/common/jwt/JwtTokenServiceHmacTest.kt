@@ -12,14 +12,14 @@ import kotlin.test.Test
         "jwt.expiration=3600"
     ]
 )
-class JwtServiceHmacTest(
+class JwtTokenServiceHmacTest(
     @Autowired
-    val jwtService: JwtService
+    val jwtTokenService: JwtTokenService
 ) {
 
     @Test
     fun `JWT 토큰 생성 성공`() {
-        val token = jwtService.generateToken()
+        val token = jwtTokenService.generateToken()
         println("발급된 토큰: $token")
         assertNotNull(token)
         assertTrue(token.isNotBlank())
@@ -27,15 +27,15 @@ class JwtServiceHmacTest(
 
     @Test
     fun `정상 토큰 검증 성공`() {
-        val token = jwtService.generateToken()
-        val result = jwtService.validateToken(token)
+        val token = jwtTokenService.generateToken()
+        val result = jwtTokenService.validateToken(token)
         assertTrue(result)
     }
 
     @Test
     fun `비정상 토큰 검증 실패`() {
         val invalidToken = "this.is.not.a.valid.jwt"
-        val result = jwtService.validateToken(invalidToken)
+        val result = jwtTokenService.validateToken(invalidToken)
         assertFalse(result)
     }
 }

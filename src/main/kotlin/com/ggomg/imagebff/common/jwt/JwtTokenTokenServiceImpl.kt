@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service
 import java.time.Instant
 
 @Service
-class JwtServiceImpl(
+class JwtTokenTokenServiceImpl(
     val jwtEncoder: JwtEncoder,
     val jwtDecoder: JwtDecoder,
     val jwtHeaderStrategy: JwtHeaderStrategy
 ) :
-    JwtService {
+    JwtTokenService {
 
     override fun generateToken(): String {
         val now = Instant.now()

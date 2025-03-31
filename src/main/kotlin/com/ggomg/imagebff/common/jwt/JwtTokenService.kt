@@ -1,7 +1,7 @@
 package com.ggomg.imagebff.common.jwt
 
 
-interface JwtService {
+interface JwtTokenService {
 
     fun generateToken(): String
 
