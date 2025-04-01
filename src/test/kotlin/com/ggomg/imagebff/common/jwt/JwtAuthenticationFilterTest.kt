@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import kotlin.test.Test
 
 class JwtAuthenticationFilterTest {
+
     private val jwtTokenService = mockk<JwtTokenService>()
     private val userDetailsService = mockk<UserDetailsService>()
     private val filter = JwtAuthenticationFilter(jwtTokenService, userDetailsService)

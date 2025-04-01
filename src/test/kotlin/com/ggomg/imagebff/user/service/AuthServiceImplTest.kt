@@ -7,63 +7,84 @@ import com.ggomg.imagebff.user.entity.User
 import com.ggomg.imagebff.user.entity.UserRole
 import com.ggomg.imagebff.user.exception.UserErrorCode
 import com.ggomg.imagebff.user.model.login.LoginRequest
+import com.ggomg.imagebff.user.model.register.RegisterRequest
 import com.ggomg.imagebff.user.repository.UserRepository
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.security.crypto.password.PasswordEncoder
 import kotlin.test.Test
 
-@ExtendWith(MockKExtension::class)
 class AuthServiceImplTest {
 
-    @MockK
-    lateinit var userRepository: UserRepository
-
-    @MockK
-    lateinit var passwordEncoder: PasswordEncoder
-
-    @MockK
-    lateinit var jwtTokenService: JwtTokenService
-
-    lateinit var authService: AuthServiceImpl
+    private lateinit var userRepository: UserRepository
+    private lateinit var passwordEncoder: PasswordEncoder
+    private lateinit var jwtTokenService: JwtTokenService
+    private lateinit var authService: AuthServiceImpl
 
     @BeforeEach
     fun setUp() {
+        userRepository = mockk()
+        passwordEncoder = mockk()
+        jwtTokenService = mockk()
         authService = AuthServiceImpl(userRepository, passwordEncoder, jwtTokenService)
     }
 
     @Test
-    fun `정상 로그인`() {
+    fun `register - 회원가입 성공`() {
         // given
-        val request = LoginRequest(email = "test@example.com", password = "1234")
+        val request = RegisterRequest("tester", "test@email.com", "plainPassword")
+        val encodedPassword = "encodedPassword"
+        val savedUser = User(
+            name = request.name,
+            email = request.email,
+            password = encodedPassword,
+            authType = AuthType.NORMAL,
+            userRole = UserRole.ROLE_USER
+        )
+
+        every { passwordEncoder.encode(request.password) } returns encodedPassword
+        every { userRepository.save(any()) } returns savedUser
+        every { jwtTokenService.getEmailFromToken(savedUser.email) } returns "mockToken"
+
+        // when
+        val response = authService.register(request)
+
+        // then
+        assertEquals("mockToken", response.token)
+        verify { userRepository.save(any()) }
+    }
+
+    @Test
+    fun `login - 로그인 성공`() {
+        // given
+        val request = LoginRequest("user@email.com", "password123")
         val user = User(
-            id = 1L,
-            name = "홍길동",
-            email = "test@example.com",
-            password = "encodedPwd",
+            name = "user",
+            email = request.email,
+            password = "encodedPassword",
             authType = AuthType.NORMAL,
             userRole = UserRole.ROLE_USER
         )
 
         every { userRepository.findByEmail(request.email) } returns user
         every { passwordEncoder.matches(request.password, user.password) } returns true
+        every { jwtTokenService.generateToken(user.email) } returns "loginToken"
 
         // when
         val response = authService.login(request)
 
         // then
-        assertTrue(response.success)
+        assertEquals("loginToken", response.token)
     }
 
     @Test
-    fun `없는 유저일 경우 예외 발생`() {
+    fun `login - 존재하지 않는 사용자 예외`() {
         // given
-        val request = LoginRequest(email = "nouser@example.com", password = "1234")
+        val request = LoginRequest("noone@email.com", "password")
         every { userRepository.findByEmail(request.email) } returns null
 
         // then
@@ -74,10 +95,16 @@ class AuthServiceImplTest {
     }
 
     @Test
-    fun `비밀번호 틀릴 경우 예외 발생`() {
+    fun `login - 비밀번호 불일치 예외`() {
         // given
-        val request = LoginRequest(email = "test@example.com", password = "wrongpass")
-        val user = User(1L, "홍길동", "test@example.com", "encodedPwd", AuthType.NORMAL, UserRole.ROLE_USER)
+        val request = LoginRequest("user@email.com", "wrongPassword")
+        val user = User(
+            name = "user",
+            email = request.email,
+            password = "encodedPassword",
+            authType = AuthType.NORMAL,
+            userRole = UserRole.ROLE_USER
+        )
 
         every { userRepository.findByEmail(request.email) } returns user
         every { passwordEncoder.matches(request.password, user.password) } returns false

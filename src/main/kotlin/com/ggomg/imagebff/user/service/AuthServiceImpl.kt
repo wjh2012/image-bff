@@ -29,10 +29,11 @@ class AuthServiceImpl(
             password = encodedPassword,
             authType = AuthType.NORMAL,
             userRole = UserRole.ROLE_USER
-        );
-        userRepository.save(user)
+        )
+        val savedUser = userRepository.save(user)
+        val token = jwtTokenService.getEmailFromToken(savedUser.email)
 
-        return RegisterResponse(success = true)
+        return RegisterResponse(token = token)
     }
 
     override fun login(loginRequest: LoginRequest): LoginResponse {
@@ -41,12 +42,12 @@ class AuthServiceImpl(
                 UserErrorCode.NOT_EXISTS_USER,
                 "user not found. userEmail: ${loginRequest.email}"
             )
-
         if (!passwordEncoder.matches(loginRequest.password, user.password)) {
             throw BusinessException(UserErrorCode.INVALID_PASSWORD, "invalid password")
         }
+        val token = jwtTokenService.generateToken(email = user.email)
 
-        return LoginResponse(success = true)
+        return LoginResponse(token = token)
     }
 
 }

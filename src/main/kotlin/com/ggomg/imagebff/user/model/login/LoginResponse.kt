@@ -1,5 +1,5 @@
 package com.ggomg.imagebff.user.model.login
 
-data class LoginResponse (
-    val success: Boolean,
+data class LoginResponse(
+    val token: String? = null,
 )
