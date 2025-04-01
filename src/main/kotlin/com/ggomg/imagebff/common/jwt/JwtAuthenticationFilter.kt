@@ -14,24 +14,29 @@ class JwtAuthenticationFilter(
     private val jwtTokenService: JwtTokenService,
     private val userDetailsService: UserDetailsService
 ) : OncePerRequestFilter() {
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val token = resolveToken(request)
+        try {
+            val token = resolveToken(request)
 
-        if (token != null && jwtTokenService.validateToken(token)) {
-            val email = jwtTokenService.getEmailFromToken(token)
-            val userDetails = userDetailsService.loadUserByUsername(email)
+            if (token != null && jwtTokenService.validateToken(token)) {
+                val email = jwtTokenService.getEmailFromToken(token)
+                val userDetails = userDetailsService.loadUserByUsername(email)
 
-            val auth = UsernamePasswordAuthenticationToken(
-                userDetails,
-                null,
-                userDetails.authorities
-            )
+                val auth = UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    null,
+                    userDetails.authorities
+                )
 
-            SecurityContextHolder.getContext().authentication = auth
+                SecurityContextHolder.getContext().authentication = auth
+            }
+        } catch (ex: Exception) {
+            logger.warn("JWT 필터 처리 중 오류 발생: ${ex.message}")
         }
 
         filterChain.doFilter(request, response)
