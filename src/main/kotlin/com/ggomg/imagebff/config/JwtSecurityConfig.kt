@@ -1,6 +1,8 @@
 package com.ggomg.imagebff.config
 
-import com.ggomg.imagebff.common.jwt.JwtAuthenticationFilter
+import com.ggomg.imagebff.common.auth.filter.JwtAuthenticationFilter
+import com.ggomg.imagebff.common.auth.jwt.JwtTokenService
+import com.ggomg.imagebff.common.auth.oauth2.OAuth2AuthenticationSuccessHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.Customizer
@@ -17,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 class JwtSecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val oAuth2AuthenticationSuccessHandler: OAuth2AuthenticationSuccessHandler,
 ) {
 
 
@@ -26,7 +29,7 @@ class JwtSecurityConfig(
     }
 
     @Bean
-    fun filterChain(http: HttpSecurity): SecurityFilterChain {
+    fun filterChain(http: HttpSecurity, jwtTokenService: JwtTokenService): SecurityFilterChain {
         http
             .csrf { it.disable() }
             .sessionManagement {
@@ -45,6 +48,10 @@ class JwtSecurityConfig(
             }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
+            .oauth2Login {
+                it
+                    .successHandler(oAuth2AuthenticationSuccessHandler)
+            }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()

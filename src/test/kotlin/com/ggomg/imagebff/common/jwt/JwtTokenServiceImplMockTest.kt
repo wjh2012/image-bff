@@ -1,10 +1,10 @@
 package com.ggomg.imagebff.common.jwt
 
-import com.ggomg.imagebff.common.jwt.jwtHeaderStrategy.JwtHeaderStrategy
+import com.ggomg.imagebff.common.auth.jwt.JwtTokenTokenServiceImpl
+import com.ggomg.imagebff.common.auth.jwt.jwtHeaderStrategy.JwtHeaderStrategy
 import io.mockk.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm
 import org.springframework.security.oauth2.jwt.*
 
 class JwtTokenServiceImplMockTest {
@@ -23,39 +23,44 @@ class JwtTokenServiceImplMockTest {
     }
 
     @Test
-    fun `JWT 토큰 생성 성공`() {
+    fun `JWT 토큰 검증 성공 - token_type 이 LOGIN 인 경우`() {
         // given
-        val email = "test@example.com"
-
+        val claims = mapOf("token_type" to "LOGIN")
         val mockJwt = mockk<Jwt>()
-        every { mockJwt.tokenValue } returns "mocked-token"
-        every { jwtEncoder.encode(any()) } returns mockJwt
-        every { jwtHeaderStrategy.getJwsHeader() } returns
-                JwsHeader.with(SignatureAlgorithm.RS256).build()
+        every { mockJwt.claims } returns claims
+        every { jwtDecoder.decode("valid-token") } returns mockJwt
 
         // when
-        val token = jwtService.generateToken(email)
-
-        // then
-        assertEquals("mocked-token", token)
-        verify { jwtEncoder.encode(any()) }
-    }
-
-    @Test
-    fun `JWT 토큰 검증 성공`() {
-        every { jwtDecoder.decode("valid-token") } returns mockk()
-
         val result = jwtService.validateToken("valid-token")
 
+        // then
         assertTrue(result)
     }
 
     @Test
-    fun `JWT 토큰 검증 실패`() {
+    fun `JWT 토큰 검증 실패 - token_type 불일치 (REGISTER)`() {
+        // given
+        val claims = mapOf("token_type" to "REGISTER")
+        val mockJwt = mockk<Jwt>()
+        every { mockJwt.claims } returns claims
+        every { jwtDecoder.decode("wrong-type-token") } returns mockJwt
+
+        // when
+        val result = jwtService.validateToken("wrong-type-token")
+
+        // then
+        assertFalse(result)
+    }
+
+    @Test
+    fun `JWT 토큰 검증 실패 - 디코딩 예외 발생`() {
+        // given
         every { jwtDecoder.decode("invalid-token") } throws JwtException("Invalid")
 
+        // when
         val result = jwtService.validateToken("invalid-token")
 
+        // then
         assertFalse(result)
     }
 
