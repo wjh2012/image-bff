@@ -1,6 +1,8 @@
 package com.ggomg.imagebff.common.jwt
 
-import com.ggomg.imagebff.common.jwt.model.CustomUserDetails
+import com.ggomg.imagebff.common.auth.filter.JwtAuthenticationFilter
+import com.ggomg.imagebff.common.auth.jwt.JwtTokenService
+import com.ggomg.imagebff.common.auth.model.CustomUserDetails
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just

@@ -1,4 +1,4 @@
-package com.ggomg.imagebff.common.jwt.model
+package com.ggomg.imagebff.common.auth.model
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -8,7 +8,7 @@ class CustomUserDetails(
     private val password: String,
     private val authorities: List<GrantedAuthority>
 ) : UserDetails {
-    
+
     override fun getAuthorities(): List<GrantedAuthority> {
         return authorities
     }

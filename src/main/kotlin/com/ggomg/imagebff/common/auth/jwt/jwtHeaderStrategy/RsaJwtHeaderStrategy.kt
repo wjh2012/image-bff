@@ -1,4 +1,4 @@
-package com.ggomg.imagebff.common.jwt.jwtHeaderStrategy
+package com.ggomg.imagebff.common.auth.jwt.jwtHeaderStrategy
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm

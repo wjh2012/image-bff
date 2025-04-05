@@ -1,6 +1,6 @@
-package com.ggomg.imagebff.common.jwt
+package com.ggomg.imagebff.common.auth.service
 
-import com.ggomg.imagebff.common.jwt.model.CustomUserDetails
+import com.ggomg.imagebff.common.auth.model.CustomUserDetails
 import com.ggomg.imagebff.user.repository.UserRepository
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails

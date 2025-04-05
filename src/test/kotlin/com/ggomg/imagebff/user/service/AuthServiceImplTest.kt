@@ -1,7 +1,7 @@
 package com.ggomg.imagebff.user.service
 
 import BusinessException
-import com.ggomg.imagebff.common.jwt.JwtTokenService
+import com.ggomg.imagebff.common.auth.jwt.JwtTokenService
 import com.ggomg.imagebff.user.entity.AuthType
 import com.ggomg.imagebff.user.entity.User
 import com.ggomg.imagebff.user.entity.UserRole

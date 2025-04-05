@@ -1,6 +1,7 @@
 package com.ggomg.imagebff.common.jwt
 
-import com.ggomg.imagebff.common.jwt.jwtHeaderStrategy.JwtHeaderStrategy
+import com.ggomg.imagebff.common.auth.jwt.JwtTokenTokenServiceImpl
+import com.ggomg.imagebff.common.auth.jwt.jwtHeaderStrategy.JwtHeaderStrategy
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet

@@ -1,4 +1,4 @@
-package com.ggomg.imagebff.common.jwt.config
+package com.ggomg.imagebff.common.auth.jwt.config
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean

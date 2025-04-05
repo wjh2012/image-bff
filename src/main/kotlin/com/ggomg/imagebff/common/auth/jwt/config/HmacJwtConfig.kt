@@ -1,4 +1,4 @@
-package com.ggomg.imagebff.common.jwt.config
+package com.ggomg.imagebff.common.auth.jwt.config
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret
 import com.nimbusds.jose.proc.SecurityContext

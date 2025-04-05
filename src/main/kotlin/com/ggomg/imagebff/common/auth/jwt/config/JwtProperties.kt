@@ -1,4 +1,4 @@
-package com.ggomg.imagebff.common.jwt.config
+package com.ggomg.imagebff.common.auth.jwt.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

@@ -1,5 +1,6 @@
-package com.ggomg.imagebff.common.jwt
+package com.ggomg.imagebff.common.auth.filter
 
+import com.ggomg.imagebff.common.auth.jwt.JwtTokenService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

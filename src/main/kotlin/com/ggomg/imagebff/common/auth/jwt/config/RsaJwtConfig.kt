@@ -1,4 +1,4 @@
-package com.ggomg.imagebff.common.jwt.config
+package com.ggomg.imagebff.common.auth.jwt.config
 
 import com.nimbusds.jose.jwk.JWK
 import com.nimbusds.jose.jwk.JWKSet
