@@ -1,4 +1,4 @@
-package com.ggomg.imagebff.common.jwt
+package com.ggomg.imagebff.common.auth.jwt
 
 import com.ggomg.imagebff.common.auth.jwt.JwtTokenTokenServiceImpl
 import com.ggomg.imagebff.common.auth.jwt.jwtHeaderStrategy.JwtHeaderStrategy

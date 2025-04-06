@@ -1,4 +1,4 @@
-package com.ggomg.imagebff.common.jwt
+package com.ggomg.imagebff.common.auth.jwt
 
 import com.ggomg.imagebff.common.auth.jwt.JwtTokenService
 import org.junit.jupiter.api.Assertions.*
@@ -6,14 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import kotlin.test.Test
 
+
 @SpringBootTest(
     properties = [
-        "jwt.mode=hmac",
-        "jwt.hmac.secret=j0NrY1v5S5XuilYuEUFsLfprgRqnIO1l5/fijXSNqzQ=",
+        "jwt.mode=rsa",
+        "jwt.rsa.public-key-path=jwt/public.pem",
+        "jwt.rsa.private-key-path=jwt/private.pem",
         "jwt.expiration=3600"
-    ]
+    ],
 )
-class JwtTokenServiceHmacTest(
+class JwtTokenServiceRsaTest(
     @Autowired
     val jwtTokenService: JwtTokenService
 ) {
