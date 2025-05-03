@@ -39,7 +39,7 @@ class OAuth2AuthenticationSuccessHandler(
             cookie.maxAge = 60 * 5 // 5분 유효
             response.addCookie(cookie)
 
-            response.sendRedirect("http://localhost:3000/oauth2/redirect?registration_required=true")
+            response.sendRedirect("http://localhost:3000/oauth2/redirect")
             return
         }
 
@@ -53,6 +53,6 @@ class OAuth2AuthenticationSuccessHandler(
         cookie.maxAge = 60 * 60 // 1시간
 
         response.addCookie(cookie)
-        response.sendRedirect("http://localhost:3000/oauth2/redirect")
+        response.sendRedirect("http://localhost:3000")
     }
 }
