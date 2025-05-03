@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.context.NullSecurityContextRepository
 
 
 @Configuration
@@ -30,13 +31,14 @@ class JwtSecurityConfig(
     }
 
     @Bean
-    fun registerFilterChain(http: HttpSecurity, jwtTokenService: JwtTokenService): SecurityFilterChain {
+    fun registerFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .securityMatcher("/oauth2/sign-up/**")
             .csrf { it.disable() }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
+            .securityContext { it.securityContextRepository(NullSecurityContextRepository()) } // ✅ 세션 저장 방지
             .oauth2Login(Customizer.withDefaults())
             .authorizeHttpRequests {
                 it
@@ -53,13 +55,14 @@ class JwtSecurityConfig(
     }
 
     @Bean
-    fun defaultFilterChain(http: HttpSecurity, jwtTokenService: JwtTokenService): SecurityFilterChain {
+    fun defaultFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .securityMatcher("/**")
             .csrf { it.disable() }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
+            .securityContext { it.securityContextRepository(NullSecurityContextRepository()) } // ✅ 세션 저장 방지
             .oauth2Login(Customizer.withDefaults())
             .authorizeHttpRequests {
                 it
@@ -76,8 +79,10 @@ class JwtSecurityConfig(
             .oauth2Login {
                 it
                     .successHandler(oAuth2AuthenticationSuccessHandler)
+                    .failureUrl("http://localhost:3000/login?error=missing_email")
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+
 
         return http.build()
     }
