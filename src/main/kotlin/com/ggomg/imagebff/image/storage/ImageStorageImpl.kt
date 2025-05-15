@@ -4,6 +4,7 @@ import com.ggomg.imagebff.config.MinioProperties
 import com.ggomg.imagebff.image.domain.Image
 import com.ggomg.imagebff.image.domain.ImageStorage
 import com.ggomg.imagebff.image.model.PresignedUploadUrl
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.minio.BucketExistsArgs
 import io.minio.GetPresignedObjectUrlArgs
 import io.minio.MakeBucketArgs
@@ -11,6 +12,8 @@ import io.minio.MinioClient
 import io.minio.http.Method
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
+
+private val logger = KotlinLogging.logger {}
 
 @Component
 class ImageStorageImpl(
@@ -29,9 +32,9 @@ class ImageStorageImpl(
                 minioClient.makeBucket(
                     MakeBucketArgs.builder().bucket(bucketName).build()
                 )
-                println("✅ 버킷 생성 완료: $bucketName")
+                logger.info { "✅ 버킷 생성 완료: $bucketName" }
             } else {
-                println("ℹ️ 이미 존재하는 버킷: $bucketName")
+                logger.info { "ℹ️ 이미 존재하는 버킷: $bucketName" }
             }
         } catch (e: Exception) {
             throw RuntimeException("MinIO 버킷 확인/생성 실패", e)

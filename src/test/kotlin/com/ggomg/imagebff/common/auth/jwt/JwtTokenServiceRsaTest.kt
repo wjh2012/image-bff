@@ -1,10 +1,12 @@
 package com.ggomg.imagebff.common.auth.jwt
 
-import com.ggomg.imagebff.common.auth.jwt.JwtTokenService
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import kotlin.test.Test
+
+private val logger = KotlinLogging.logger {}
 
 
 @SpringBootTest(
@@ -24,7 +26,7 @@ class JwtTokenServiceRsaTest(
     fun `JWT 토큰 생성 성공`() {
         val email = "test@example.com"
         val token = jwtTokenService.generateToken(email)
-        println("발급된 토큰: $token")
+        logger.info { "발급된 토큰: $token" }
         assertNotNull(token)
         assertTrue(token.isNotBlank())
     }

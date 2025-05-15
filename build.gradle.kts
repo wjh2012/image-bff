@@ -43,6 +43,9 @@ dependencies {
     // jwt
     implementation("com.nimbusds:nimbus-jose-jwt:10.0.2")
 
+    // logging
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
+
     compileOnly("org.projectlombok:lombok")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
