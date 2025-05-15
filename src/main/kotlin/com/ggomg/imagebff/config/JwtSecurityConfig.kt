@@ -2,8 +2,9 @@ package com.ggomg.imagebff.config
 
 import com.ggomg.imagebff.common.auth.filter.JwtAuthenticationFilter
 import com.ggomg.imagebff.common.auth.filter.RegistrationTemporaryTokenFilter
-import com.ggomg.imagebff.common.auth.jwt.JwtTokenService
+import com.ggomg.imagebff.common.auth.jwt.config.JwtProperties
 import com.ggomg.imagebff.common.auth.oauth2.OAuth2AuthenticationSuccessHandler
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.Customizer
@@ -15,15 +16,32 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.context.NullSecurityContextRepository
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 
 @Configuration
 @EnableWebSecurity
+@EnableConfigurationProperties(JwtProperties::class)
 class JwtSecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val registrationTemporaryTokenFilter: RegistrationTemporaryTokenFilter,
     private val oAuth2AuthenticationSuccessHandler: OAuth2AuthenticationSuccessHandler,
 ) {
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val config = CorsConfiguration()
+        config.allowedOrigins = listOf("http://localhost:3000")
+        config.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        config.allowedHeaders = listOf("*")
+        config.allowCredentials = true
+
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", config)
+        return source
+    }
 
     @Bean
     fun passwordEncoder(): PasswordEncoder {
@@ -58,31 +76,30 @@ class JwtSecurityConfig(
     fun defaultFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .securityMatcher("/**")
+            .cors { it.configurationSource(corsConfigurationSource()) } // ✅ 여기에 추가
             .csrf { it.disable() }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
-            .securityContext { it.securityContextRepository(NullSecurityContextRepository()) } // ✅ 세션 저장 방지
-            .oauth2Login(Customizer.withDefaults())
+            .securityContext { it.securityContextRepository(NullSecurityContextRepository()) }
             .authorizeHttpRequests {
                 it
                     .requestMatchers(
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
-                        "/auth/**"
+                        "/auth/**",
+                        "/image/**"
                     ).permitAll()
                     .anyRequest().authenticated()
             }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
             .oauth2Login {
-                it
-                    .successHandler(oAuth2AuthenticationSuccessHandler)
+                it.successHandler(oAuth2AuthenticationSuccessHandler)
                     .failureUrl("http://localhost:3000/login?error=missing_email")
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
-
 
         return http.build()
     }

@@ -1,12 +1,11 @@
 package com.ggomg.imagebff
 
-import com.ggomg.imagebff.common.auth.jwt.config.JwtProperties
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 
+@EnableJpaAuditing
 @SpringBootApplication
-@EnableConfigurationProperties(JwtProperties::class)
 class ImageBffApplication
 
 fun main(args: Array<String>) {

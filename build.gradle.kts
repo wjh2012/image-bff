@@ -34,6 +34,13 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+    // minio
+    implementation("io.minio:minio:8.5.17")
+
+    // uuid
+    implementation("com.fasterxml.uuid:java-uuid-generator:5.1.0")
+
+    // jwt
     implementation("com.nimbusds:nimbus-jose-jwt:10.0.2")
 
     compileOnly("org.projectlombok:lombok")
@@ -43,6 +50,7 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")
 
+    // persistence
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.h2database:h2")
 

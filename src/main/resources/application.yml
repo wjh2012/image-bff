@@ -5,7 +5,7 @@ spring:
 
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:ggomg
+    url: jdbc:h2:file:./ggomgdb;AUTO_SERVER=TRUE
     username: sa
     password:
 
@@ -23,7 +23,14 @@ spring:
   h2:
     console:
       enabled: true
-  
+
+
   config:
     import:
       - application-security.yml
+
+minio:
+  url: http://192.168.45.131:9000
+  access-key: admin
+  secret-key: adminadmin
+  bucket: example-bucket
