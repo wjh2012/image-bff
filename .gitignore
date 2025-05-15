@@ -42,3 +42,5 @@ out/
 ### properties ###
 application-security.yml
 /src/main/resources/jwt/
+
+*.db
