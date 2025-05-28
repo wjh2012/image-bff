@@ -25,7 +25,12 @@ class ImageServiceImpl(
     override fun saveAll(filenames: List<String>, contentTypes: List<String>): List<PresignedUploadUrl> {
         return filenames.zip(contentTypes).map { (filename, contentType) ->
             val imageId = Generators.timeBasedEpochGenerator().generate()
-            val image = Image(imageId, filename, contentType, false)
+            val image = Image(
+                imageId = imageId,
+                originalName = filename,
+                contentType = contentType,
+                uploadStatus = false,
+            )
             val presignedUrl = imageStorage.generateUploadPresignedUrl(image)
             imageRepository.save(image)
             presignedUrl

@@ -28,6 +28,6 @@ class ImageEntity(
 
     companion object {
         fun fromDomain(image: Image): ImageEntity =
-            ImageEntity(image.imageId, image.filename, image.contentType, image.uploadStatus)
+            ImageEntity(image.imageId, image.originalName, image.contentType, image.uploadStatus)
     }
 }
