@@ -1,4 +1,4 @@
-package com.ggomg.imagebff.image.controller
+package com.ggomg.imagebff.image.api
 
 import com.ggomg.imagebff.image.application.ImageService
 import com.ggomg.imagebff.image.model.PresignedUploadUrl

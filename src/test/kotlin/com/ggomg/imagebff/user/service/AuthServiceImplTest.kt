@@ -2,13 +2,16 @@ package com.ggomg.imagebff.user.service
 
 import BusinessException
 import com.ggomg.imagebff.common.auth.jwt.JwtTokenService
-import com.ggomg.imagebff.user.entity.AuthType
-import com.ggomg.imagebff.user.entity.User
-import com.ggomg.imagebff.user.entity.UserRole
+import com.ggomg.imagebff.user.application.UserService
+import com.ggomg.imagebff.user.domain.AuthType
+import com.ggomg.imagebff.user.domain.User
+import com.ggomg.imagebff.user.domain.UserRepository
+import com.ggomg.imagebff.user.infrastructure.entity.UserEntity
+import com.ggomg.imagebff.user.domain.UserRole
 import com.ggomg.imagebff.user.exception.UserErrorCode
 import com.ggomg.imagebff.user.model.login.LoginRequest
 import com.ggomg.imagebff.user.model.register.RegisterRequest
-import com.ggomg.imagebff.user.repository.UserRepository
+import com.ggomg.imagebff.user.infrastructure.repository.UserJpaRepository
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -23,14 +26,14 @@ class AuthServiceImplTest {
     private lateinit var userRepository: UserRepository
     private lateinit var passwordEncoder: PasswordEncoder
     private lateinit var jwtTokenService: JwtTokenService
-    private lateinit var authService: AuthServiceImpl
+    private lateinit var userService: UserService
 
     @BeforeEach
     fun setUp() {
         userRepository = mockk()
         passwordEncoder = mockk()
         jwtTokenService = mockk()
-        authService = AuthServiceImpl(userRepository, passwordEncoder, jwtTokenService)
+        userService = UserService(userRepository, passwordEncoder, jwtTokenService)
     }
 
     @Test
@@ -48,10 +51,10 @@ class AuthServiceImplTest {
 
         every { passwordEncoder.encode(request.password) } returns encodedPassword
         every { userRepository.save(any()) } returns savedUser
-        every { jwtTokenService.getEmailFromToken(savedUser.email) } returns "mockToken"
-
+        every { userRepository.findByEmail(request.email) } returns null
+        every { jwtTokenService.generateToken(savedUser.email) } returns "mockToken"
         // when
-        val response = authService.register(request)
+        val response = userService.signUp(request)
 
         // then
         assertEquals("mockToken", response.token)
@@ -75,7 +78,7 @@ class AuthServiceImplTest {
         every { jwtTokenService.generateToken(user.email) } returns "loginToken"
 
         // when
-        val response = authService.login(request)
+        val response = userService.login(request)
 
         // then
         assertEquals("loginToken", response.token)
@@ -89,7 +92,7 @@ class AuthServiceImplTest {
 
         // then
         val exception = assertThrows<BusinessException> {
-            authService.login(request)
+            userService.login(request)
         }
         assertEquals(UserErrorCode.NOT_EXISTS_USER, exception.errorCode)
     }
@@ -111,7 +114,7 @@ class AuthServiceImplTest {
 
         // then
         val exception = assertThrows<BusinessException> {
-            authService.login(request)
+            userService.login(request)
         }
         assertEquals(UserErrorCode.INVALID_PASSWORD, exception.errorCode)
     }

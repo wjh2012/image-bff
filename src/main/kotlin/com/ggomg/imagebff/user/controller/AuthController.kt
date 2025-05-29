@@ -1,10 +1,10 @@
 package com.ggomg.imagebff.user.controller
 
+import com.ggomg.imagebff.user.application.UserService
 import com.ggomg.imagebff.user.model.login.LoginRequest
 import com.ggomg.imagebff.user.model.login.LoginResponse
 import com.ggomg.imagebff.user.model.register.RegisterRequest
 import com.ggomg.imagebff.user.model.register.RegisterResponse
-import com.ggomg.imagebff.user.service.AuthService
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/auth")
 class AuthController(
-    private val authService: AuthService
+    private val authService: UserService,
 ) {
 
     @PostMapping("/register")
     @Operation(summary = "회원가입", description = "사용자 회원가입을 진행한다.")
     fun register(@RequestBody registerRequest: RegisterRequest): ResponseEntity<RegisterResponse> {
-        val registerResponse = authService.register(
+        val registerResponse = authService.signUp(
             registerRequest
         )
         return ResponseEntity.ok().body(registerResponse)

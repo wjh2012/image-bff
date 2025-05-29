@@ -2,7 +2,7 @@ package com.ggomg.imagebff.common.auth.filter
 
 import com.ggomg.imagebff.common.auth.jwt.RegistrationTokenService
 import com.ggomg.imagebff.common.auth.model.CustomUserDetails
-import com.ggomg.imagebff.user.entity.UserRole
+import com.ggomg.imagebff.user.domain.UserRole
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

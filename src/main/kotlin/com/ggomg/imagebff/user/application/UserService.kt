@@ -1,53 +1,60 @@
-package com.ggomg.imagebff.user.service
+package com.ggomg.imagebff.user.application
 
 import BusinessException
 import com.ggomg.imagebff.common.auth.jwt.JwtTokenService
-import com.ggomg.imagebff.user.entity.AuthType
-import com.ggomg.imagebff.user.entity.User
-import com.ggomg.imagebff.user.entity.UserRole
+import com.ggomg.imagebff.user.domain.AuthType
+import com.ggomg.imagebff.user.domain.User
+import com.ggomg.imagebff.user.domain.UserRepository
+import com.ggomg.imagebff.user.domain.UserRole
 import com.ggomg.imagebff.user.exception.UserErrorCode
 import com.ggomg.imagebff.user.model.login.LoginRequest
 import com.ggomg.imagebff.user.model.login.LoginResponse
 import com.ggomg.imagebff.user.model.register.RegisterRequest
 import com.ggomg.imagebff.user.model.register.RegisterResponse
-import com.ggomg.imagebff.user.repository.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
-class AuthServiceImpl(
+class UserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenService: JwtTokenService,
-) : AuthService {
-
-    override fun register(registerRequest: RegisterRequest): RegisterResponse {
-        val encodedPassword = passwordEncoder.encode(registerRequest.password)
+) {
+    @Transactional
+    fun signUp(request: RegisterRequest): RegisterResponse {
+        if (userRepository.findByEmail(request.email) != null) {
+            throw BusinessException(
+                UserErrorCode.DUPLICATE_USER,
+                "이미 등록된 사용자입니다: ${request.email}"
+            )
+        }
+        val encodedPassword = passwordEncoder.encode(request.password)
         val user = User(
-            name = registerRequest.name,
-            email = registerRequest.email,
+            name = request.name,
+            email = request.email,
             password = encodedPassword,
             authType = AuthType.NORMAL,
             userRole = UserRole.ROLE_USER
         )
-        val savedUser = userRepository.save(user)
-        val token = jwtTokenService.getEmailFromToken(savedUser.email)
-
+        val save = userRepository.save(user)
+        val token = jwtTokenService.generateToken(save.email)
         return RegisterResponse(token = token)
     }
 
-    override fun login(loginRequest: LoginRequest): LoginResponse {
-        val user = userRepository.findByEmail(loginRequest.email)
+    fun login(request: LoginRequest): LoginResponse {
+        val user = userRepository.findByEmail(request.email)
             ?: throw BusinessException(
                 UserErrorCode.NOT_EXISTS_USER,
-                "user not found. userEmail: ${loginRequest.email}"
+                "user not found. userEmail: ${request.email}"
             )
-        if (!passwordEncoder.matches(loginRequest.password, user.password)) {
+
+        if (!passwordEncoder.matches(request.password, user.password)) {
             throw BusinessException(UserErrorCode.INVALID_PASSWORD, "invalid password")
         }
+
         val token = jwtTokenService.generateToken(email = user.email)
 
         return LoginResponse(token = token)
     }
-
 }

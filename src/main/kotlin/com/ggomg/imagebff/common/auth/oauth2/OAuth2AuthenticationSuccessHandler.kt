@@ -1,7 +1,7 @@
 package com.ggomg.imagebff.common.auth.oauth2
 
 import com.ggomg.imagebff.common.auth.jwt.JwtTokenService
-import com.ggomg.imagebff.user.repository.UserRepository
+import com.ggomg.imagebff.user.infrastructure.repository.UserJpaRepository
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class OAuth2AuthenticationSuccessHandler(
-    private val userRepository: UserRepository,
+    private val userJpaRepository: UserJpaRepository,
     private val jwtTokenService: JwtTokenService
 ) : AuthenticationSuccessHandler {
 
@@ -30,7 +30,7 @@ class OAuth2AuthenticationSuccessHandler(
             return
         }
 
-        val user = userRepository.findByEmail(email)
+        val user = userJpaRepository.findByEmail(email)
 
         if (user == null) {
             val cookie = Cookie("pending_email", email)

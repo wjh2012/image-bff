@@ -1,11 +1,13 @@
-package com.ggomg.imagebff.user.entity
+package com.ggomg.imagebff.user.infrastructure.entity
 
 import com.ggomg.imagebff.common.base.BaseEntity
+import com.ggomg.imagebff.user.domain.AuthType
+import com.ggomg.imagebff.user.domain.UserRole
 import jakarta.persistence.*
 
 @Entity
 @Table(name = "users")
-class User(
+class UserEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,

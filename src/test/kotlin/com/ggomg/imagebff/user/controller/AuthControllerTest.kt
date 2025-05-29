@@ -1,11 +1,11 @@
 package com.ggomg.imagebff.user.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.ggomg.imagebff.user.application.UserService
 import com.ggomg.imagebff.user.model.login.LoginRequest
 import com.ggomg.imagebff.user.model.login.LoginResponse
 import com.ggomg.imagebff.user.model.register.RegisterRequest
 import com.ggomg.imagebff.user.model.register.RegisterResponse
-import com.ggomg.imagebff.user.service.AuthService
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
@@ -18,13 +18,13 @@ import kotlin.test.Test
 class AuthControllerTest {
 
     private lateinit var mockMvc: MockMvc
-    private lateinit var authService: AuthService
+    private lateinit var userService: UserService
     private val objectMapper = ObjectMapper()
 
     @BeforeEach
     fun setup() {
-        authService = mockk()
-        val authController = AuthController(authService)
+        userService = mockk()
+        val authController = AuthController(userService)
         mockMvc = MockMvcBuilders.standaloneSetup(authController).build()
     }
 
@@ -34,7 +34,7 @@ class AuthControllerTest {
         val request = RegisterRequest("홍길동", "test@example.com", "password123")
         val response = RegisterResponse(token = "register-token")
 
-        every { authService.register(request) } returns response
+        every { userService.signUp(request) } returns response
 
         // when & then
         mockMvc.post("/auth/register") {
@@ -52,7 +52,7 @@ class AuthControllerTest {
         val request = LoginRequest("test@example.com", "password123")
         val response = LoginResponse(token = "login-token")
 
-        every { authService.login(request) } returns response
+        every { userService.login(request) } returns response
 
         // when & then
         mockMvc.post("/auth/login") {
