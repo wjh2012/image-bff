@@ -1,4 +1,4 @@
-package com.ggomg.imagebff.image.infrastructure
+package com.ggomg.imagebff.image.infrastructure.entity
 
 import com.ggomg.imagebff.common.base.BaseEntity
 import com.ggomg.imagebff.image.domain.Image
