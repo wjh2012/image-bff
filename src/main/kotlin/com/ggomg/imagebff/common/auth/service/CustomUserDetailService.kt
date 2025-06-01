@@ -16,7 +16,7 @@ class CustomUserDetailService(
     override fun loadUserByUsername(email: String): UserDetails {
         val user = userJpaRepository.findByEmail(email) ?: throw UsernameNotFoundException("User not found")
         val authorities = listOf(SimpleGrantedAuthority(user.userRole.name))
-        return CustomUserDetails(user.email, user.password, authorities)
+        return CustomUserDetails(user.id.toString(), user.password, authorities)
     }
 
 }

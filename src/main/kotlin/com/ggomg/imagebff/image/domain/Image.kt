@@ -1,39 +1,33 @@
 package com.ggomg.imagebff.image.domain
 
+import com.ggomg.imagebff.image.utils.ContentTypeUtil
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.UUID
 
 data class Image(
-    val imageId: UUID,
-    val originalName: String,
-    val contentType: String,
-    var uploadStatus: Boolean,
-) {
+    val imageId: String,
+    val userId: String,
 
+    val imageCreatedAt: LocalDateTime = LocalDateTime.now(),
+
+    val filename: String,
+    val contentType: String,
+
+    var uploadedAt: LocalDateTime? = null,
+    var uploadStatus: UploadStatus = UploadStatus.PENDING,
+) {
     fun markUploaded() {
-        this.uploadStatus = true
+        this.uploadStatus = UploadStatus.SUCCESS
+        this.uploadedAt = LocalDateTime.now()
     }
 
     fun generateObjectKey(): String {
-        val shortUuid = imageId.toString().replace("-", "").takeLast(8)
-
-        val now = LocalDateTime.now()
-        val datePath = now.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
-        val timePart = now.format(DateTimeFormatter.ofPattern("HHmmss"))
-
-        val prefix = "original"  // 필요시 타입별로 "thumbnail", "resized" 등도 가능
-        val ext = getExtensionFromContentType(contentType)
-
+        val shortUuid = imageId.replace("-", "").takeLast(8)
+        val datePath = imageCreatedAt.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+        val timePart = imageCreatedAt.format(DateTimeFormatter.ofPattern("HHmmss"))
+        val prefix = "original"
+        val ext = ContentTypeUtil.getExtension(contentType)
         return "$datePath/$prefix/${timePart}_$shortUuid.$ext"
     }
 
-    private fun getExtensionFromContentType(contentType: String): String {
-        return when (contentType.lowercase()) {
-            "image/jpeg", "image/jpg" -> "jpg"
-            "image/png" -> "png"
-            "image/gif" -> "gif"
-            else -> "bin"
-        }
-    }
 }
