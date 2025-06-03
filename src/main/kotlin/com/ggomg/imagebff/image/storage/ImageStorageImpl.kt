@@ -12,6 +12,7 @@ import io.minio.MinioClient
 import io.minio.http.Method
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
+import java.util.UUID
 
 private val logger = KotlinLogging.logger {}
 
@@ -53,7 +54,7 @@ class ImageStorageImpl(
                 .build()
         )
 
-        return PresignedUploadUrl(image.imageId, url)
+        return PresignedUploadUrl(UUID.fromString(image.imageId), url)
     }
 
     override fun generateDownloadPresignedUrl(
@@ -68,6 +69,6 @@ class ImageStorageImpl(
                 .build()
         )
 
-        return PresignedUploadUrl(image.imageId, url)
+        return PresignedUploadUrl(UUID.fromString(image.imageId), url)
     }
 }

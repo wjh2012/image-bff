@@ -2,7 +2,9 @@ package com.ggomg.imagebff.user.infrastructure.mapper
 
 import com.ggomg.imagebff.user.domain.User
 import com.ggomg.imagebff.user.infrastructure.entity.UserEntity
+import org.springframework.stereotype.Component
 
+@Component
 object UserMapper {
     fun toDomain(entity: UserEntity): User = User(
         id = entity.id,
