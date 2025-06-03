@@ -7,6 +7,7 @@ import com.ggomg.imagebff.common.auth.oauth2.OAuth2AuthenticationSuccessHandler
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpStatus
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -14,6 +15,8 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.access.AccessDeniedHandlerImpl
+import org.springframework.security.web.authentication.HttpStatusEntryPoint
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.context.NullSecurityContextRepository
 import org.springframework.web.cors.CorsConfiguration
@@ -82,6 +85,11 @@ class JwtSecurityConfig(
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .securityContext { it.securityContextRepository(NullSecurityContextRepository()) }
+            .exceptionHandling { exceptions ->
+                exceptions.authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                exceptions.accessDeniedHandler(AccessDeniedHandlerImpl().apply {
+                })
+            }
             .authorizeHttpRequests {
                 it
                     .requestMatchers(
@@ -89,15 +97,17 @@ class JwtSecurityConfig(
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/auth/**",
-                        "/image/**"
                     ).permitAll()
                     .anyRequest().authenticated()
             }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
             .oauth2Login {
-                it.successHandler(oAuth2AuthenticationSuccessHandler)
-                    .failureUrl("http://localhost:3000/login?error=missing_email")
+                it
+                    .successHandler(oAuth2AuthenticationSuccessHandler)
+                    .failureHandler { request, response, exception ->
+                        response.sendError(HttpStatus.UNAUTHORIZED.value(), "인증 실패: ${exception.message}")
+                    }
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 
