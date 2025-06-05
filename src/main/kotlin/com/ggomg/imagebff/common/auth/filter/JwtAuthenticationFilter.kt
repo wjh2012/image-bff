@@ -40,9 +40,15 @@ class JwtAuthenticationFilter(
                 )
 
                 SecurityContextHolder.getContext().authentication = auth
+            } else {
+                logger.warn("유효하지 않거나 없는 토큰입니다.")
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰입니다.")
+                return
             }
         } catch (ex: Exception) {
             logger.warn("JWT 필터 처리 중 오류 발생: ${ex.message}")
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "토큰 처리 중 오류가 발생했습니다.")
+            return
         }
 
         filterChain.doFilter(request, response)
