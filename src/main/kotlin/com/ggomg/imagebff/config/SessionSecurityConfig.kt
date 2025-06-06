@@ -1,16 +1,20 @@
 package com.ggomg.imagebff.config
 
 import com.ggomg.imagebff.auth.security.filter.RegistrationTemporaryTokenFilter
+import com.ggomg.imagebff.auth.security.jwt.RegistrationTokenService
 import com.ggomg.imagebff.auth.security.jwt.config.JwtProperties
 import com.ggomg.imagebff.auth.security.oauth2.OAuth2AuthenticationSuccessHandler
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.Customizer
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
@@ -27,7 +31,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableWebSecurity
 @EnableConfigurationProperties(JwtProperties::class)
 class SessionSecurityConfig(
-    private val registrationTemporaryTokenFilter: RegistrationTemporaryTokenFilter,
     private val oAuth2AuthenticationSuccessHandler: OAuth2AuthenticationSuccessHandler,
 ) {
 
@@ -50,7 +53,11 @@ class SessionSecurityConfig(
     }
 
     @Bean
-    fun registerFilterChain(http: HttpSecurity): SecurityFilterChain {
+    fun registerFilterChain(
+        http: HttpSecurity,
+        registrationTokenService: RegistrationTokenService,
+        userDetailsService: UserDetailsService
+    ): SecurityFilterChain {
         http
             .securityMatcher("/oauth2/sign-up/**")
             .csrf { it.disable() }
@@ -68,7 +75,10 @@ class SessionSecurityConfig(
             }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
-            .addFilterBefore(registrationTemporaryTokenFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(
+                RegistrationTemporaryTokenFilter(registrationTokenService, userDetailsService),
+                UsernamePasswordAuthenticationFilter::class.java
+            )
 
         return http.build()
     }
@@ -110,5 +120,9 @@ class SessionSecurityConfig(
         return http.build()
     }
 
+    @Bean
+    fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager {
+        return authenticationConfiguration.authenticationManager
+    }
 
 }

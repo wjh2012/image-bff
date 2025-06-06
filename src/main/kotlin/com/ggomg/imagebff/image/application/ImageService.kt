@@ -5,6 +5,7 @@ import com.ggomg.imagebff.image.domain.Image
 import com.ggomg.imagebff.image.domain.ImageRepository
 import com.ggomg.imagebff.image.domain.ImageStorage
 import com.ggomg.imagebff.image.model.PresignedUploadUrl
+import com.ggomg.imagebff.user.domain.UserRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.UUID
@@ -13,15 +14,18 @@ import java.util.UUID
 class ImageService(
     private val imageStorage: ImageStorage,
     private val imageRepository: ImageRepository,
+    private val userRepository: UserRepository
 ) {
 
-    fun save(userId: String, filename: String, contentType: String): PresignedUploadUrl {
-        val imageId = Generators.timeBasedEpochGenerator().generate()
+    fun save(userEmail: String, filename: String, contentType: String): PresignedUploadUrl {
+        val generatedUUID = Generators.timeBasedEpochGenerator().generate()
         val createdAt = LocalDateTime.now()
 
+        val user = userRepository.findByEmail(userEmail) ?: throw IllegalArgumentException("User not found.")
+
         val image = Image(
-            userId = userId,
-            imageId = imageId.toString(),
+            id = generatedUUID,
+            userId = user.id,
             imageCreatedAt = createdAt,
             filename = filename,
             contentType = contentType
@@ -31,14 +35,16 @@ class ImageService(
         return presignedUrl
     }
 
-    fun saveAll(userId: String, filenames: List<String>, contentTypes: List<String>): List<PresignedUploadUrl> {
+    fun saveAll(userEmail: String, filenames: List<String>, contentTypes: List<String>): List<PresignedUploadUrl> {
         return filenames.zip(contentTypes).map { (filename, contentType) ->
             val imageId = Generators.timeBasedEpochGenerator().generate()
             val createdAt = LocalDateTime.now()
 
+            val user = userRepository.findByEmail(userEmail) ?: throw IllegalArgumentException("User not found.")
+
             val image = Image(
-                userId = userId,
-                imageId = imageId.toString(),
+                id = imageId,
+                userId = user.id,
                 imageCreatedAt = createdAt,
                 filename = filename,
                 contentType = contentType

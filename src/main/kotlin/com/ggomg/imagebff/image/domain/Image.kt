@@ -3,10 +3,11 @@ package com.ggomg.imagebff.image.domain
 import com.ggomg.imagebff.image.utils.ContentTypeUtil
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 data class Image(
-    val imageId: String,
-    val userId: String,
+    val id: UUID,
+    val userId: UUID,
 
     val imageCreatedAt: LocalDateTime = LocalDateTime.now(),
 
@@ -22,7 +23,7 @@ data class Image(
     }
 
     fun generateObjectKey(): String {
-        val shortUuid = imageId.replace("-", "").takeLast(8)
+        val shortUuid = id.toString().replace("-", "").takeLast(8)
         val datePath = imageCreatedAt.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
         val timePart = imageCreatedAt.format(DateTimeFormatter.ofPattern("HHmmss"))
         val prefix = "original"

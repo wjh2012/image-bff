@@ -4,8 +4,11 @@ import com.ggomg.imagebff.user.domain.User
 import com.ggomg.imagebff.user.domain.UserRepository
 import com.ggomg.imagebff.user.infrastructure.mapper.UserMapper
 import com.ggomg.imagebff.user.infrastructure.repository.UserJpaRepository
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
+
+private val logger = KotlinLogging.logger {}
 
 @Repository
 class UserRepositoryImpl(
@@ -14,13 +17,9 @@ class UserRepositoryImpl(
 ) : UserRepository {
 
     override fun findByEmail(email: String): User? {
-        val entity = userJpaRepository.findByEmail(email)
-        return entity?.let { userMapper.toDomain(it) }
-    }
-
-    override fun findById(id: Long): User? {
-        val entity = userJpaRepository.findByIdOrNull(id)
-        return entity?.let { userMapper.toDomain(it) }
+        logger.info { "Checking for user: $email" }
+        val entity = userJpaRepository.findByEmail(email)  // nullable 그대로 유지
+        return entity?.let { userMapper.toDomain(it) }  // entity 없으면 null 리턴
     }
 
     override fun save(user: User): User {

@@ -1,7 +1,9 @@
 package com.ggomg.imagebff.user.domain
 
+import java.util.UUID
+
 class User(
-    val id: Long? = null,
+    val id: UUID,
     val name: String,
     val email: String,
     val password: String,

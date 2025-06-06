@@ -4,13 +4,13 @@ import com.ggomg.imagebff.common.base.BaseEntity
 import com.ggomg.imagebff.user.domain.AuthType
 import com.ggomg.imagebff.user.domain.UserRole
 import jakarta.persistence.*
+import java.util.UUID
 
 @Entity
 @Table(name = "users")
 class UserEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    var id: UUID,
 
     @Column(name = "name", nullable = false)
     val name: String,

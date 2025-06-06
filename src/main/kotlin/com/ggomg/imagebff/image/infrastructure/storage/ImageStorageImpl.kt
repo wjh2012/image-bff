@@ -54,7 +54,7 @@ class ImageStorageImpl(
                 .build()
         )
 
-        return PresignedUploadUrl(UUID.fromString(image.imageId), url)
+        return PresignedUploadUrl(image.id, url)
     }
 
     override fun generateDownloadPresignedUrl(
@@ -69,6 +69,6 @@ class ImageStorageImpl(
                 .build()
         )
 
-        return PresignedUploadUrl(UUID.fromString(image.imageId), url)
+        return PresignedUploadUrl(image.id, url)
     }
 }

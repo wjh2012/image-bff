@@ -1,6 +1,7 @@
 package com.ggomg.imagebff.auth.application
 
 import BusinessException
+import com.fasterxml.uuid.Generators
 import com.ggomg.imagebff.auth.security.jwt.JwtTokenService
 import com.ggomg.imagebff.user.domain.AuthType
 import com.ggomg.imagebff.user.domain.User
@@ -30,7 +31,11 @@ class JwtAuthService(
             )
         }
         val encodedPassword = passwordEncoder.encode(request.password)
+
+        val generatedUUID = Generators.timeBasedEpochGenerator().generate()
+
         val user = User(
+            id = generatedUUID,
             name = request.name,
             email = request.email,
             password = encodedPassword,

@@ -3,11 +3,15 @@ package com.ggomg.imagebff.image.presentation
 import com.ggomg.imagebff.auth.model.CustomUserDetails
 import com.ggomg.imagebff.image.application.ImageService
 import com.ggomg.imagebff.image.model.PresignedUploadUrl
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.util.*
+
+private val logger = KotlinLogging.logger {}
 
 @Tag(name = "Image", description = "이미지 presigned URL 처리")
 @RestController
@@ -31,6 +35,7 @@ class ImageController(private val imageService: ImageService) {
         @RequestParam filenames: List<String>,
         @RequestParam contentTypes: List<String>
     ): List<PresignedUploadUrl> {
+        logger.info { "Checking for Principal: ${user.username}" }
         return imageService.saveAll(user.username, filenames, contentTypes)
     }
 
