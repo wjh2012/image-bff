@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
-@Component
 class JwtAuthenticationFilter(
     private val jwtTokenService: JwtTokenService,
     private val userDetailsService: UserDetailsService

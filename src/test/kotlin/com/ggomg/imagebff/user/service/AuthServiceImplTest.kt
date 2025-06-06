@@ -2,16 +2,14 @@ package com.ggomg.imagebff.user.service
 
 import BusinessException
 import com.ggomg.imagebff.common.auth.jwt.JwtTokenService
-import com.ggomg.imagebff.user.application.UserService
+import com.ggomg.imagebff.user.application.JwtAuthService
 import com.ggomg.imagebff.user.domain.AuthType
 import com.ggomg.imagebff.user.domain.User
 import com.ggomg.imagebff.user.domain.UserRepository
-import com.ggomg.imagebff.user.infrastructure.entity.UserEntity
 import com.ggomg.imagebff.user.domain.UserRole
 import com.ggomg.imagebff.user.exception.UserErrorCode
-import com.ggomg.imagebff.user.model.login.LoginRequest
-import com.ggomg.imagebff.user.model.register.RegisterRequest
-import com.ggomg.imagebff.user.infrastructure.repository.UserJpaRepository
+import com.ggomg.imagebff.user.model.jwt.login.JwtLoginRequest
+import com.ggomg.imagebff.user.model.jwt.register.JwtRegisterRequest
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -26,20 +24,20 @@ class AuthServiceImplTest {
     private lateinit var userRepository: UserRepository
     private lateinit var passwordEncoder: PasswordEncoder
     private lateinit var jwtTokenService: JwtTokenService
-    private lateinit var userService: UserService
+    private lateinit var jwtAuthService: JwtAuthService
 
     @BeforeEach
     fun setUp() {
         userRepository = mockk()
         passwordEncoder = mockk()
         jwtTokenService = mockk()
-        userService = UserService(userRepository, passwordEncoder, jwtTokenService)
+        jwtAuthService = JwtAuthService(userRepository, passwordEncoder, jwtTokenService)
     }
 
     @Test
     fun `register - 회원가입 성공`() {
         // given
-        val request = RegisterRequest("tester", "test@email.com", "plainPassword")
+        val request = JwtRegisterRequest("tester", "test@email.com", "plainPassword")
         val encodedPassword = "encodedPassword"
         val savedUser = User(
             name = request.name,
@@ -54,7 +52,7 @@ class AuthServiceImplTest {
         every { userRepository.findByEmail(request.email) } returns null
         every { jwtTokenService.generateToken(savedUser.email) } returns "mockToken"
         // when
-        val response = userService.signUp(request)
+        val response = jwtAuthService.signUp(request)
 
         // then
         assertEquals("mockToken", response.token)
@@ -64,7 +62,7 @@ class AuthServiceImplTest {
     @Test
     fun `login - 로그인 성공`() {
         // given
-        val request = LoginRequest("user@email.com", "password123")
+        val request = JwtLoginRequest("user@email.com", "password123")
         val user = User(
             name = "user",
             email = request.email,
@@ -78,7 +76,7 @@ class AuthServiceImplTest {
         every { jwtTokenService.generateToken(user.email) } returns "loginToken"
 
         // when
-        val response = userService.login(request)
+        val response = jwtAuthService.login(request)
 
         // then
         assertEquals("loginToken", response.token)
@@ -87,12 +85,12 @@ class AuthServiceImplTest {
     @Test
     fun `login - 존재하지 않는 사용자 예외`() {
         // given
-        val request = LoginRequest("noone@email.com", "password")
+        val request = JwtLoginRequest("noone@email.com", "password")
         every { userRepository.findByEmail(request.email) } returns null
 
         // then
         val exception = assertThrows<BusinessException> {
-            userService.login(request)
+            jwtAuthService.login(request)
         }
         assertEquals(UserErrorCode.NOT_EXISTS_USER, exception.errorCode)
     }
@@ -100,7 +98,7 @@ class AuthServiceImplTest {
     @Test
     fun `login - 비밀번호 불일치 예외`() {
         // given
-        val request = LoginRequest("user@email.com", "wrongPassword")
+        val request = JwtLoginRequest("user@email.com", "wrongPassword")
         val user = User(
             name = "user",
             email = request.email,
@@ -114,7 +112,7 @@ class AuthServiceImplTest {
 
         // then
         val exception = assertThrows<BusinessException> {
-            userService.login(request)
+            jwtAuthService.login(request)
         }
         assertEquals(UserErrorCode.INVALID_PASSWORD, exception.errorCode)
     }

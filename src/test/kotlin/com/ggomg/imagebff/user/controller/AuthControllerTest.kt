@@ -1,11 +1,11 @@
 package com.ggomg.imagebff.user.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.ggomg.imagebff.user.application.UserService
-import com.ggomg.imagebff.user.model.login.LoginRequest
-import com.ggomg.imagebff.user.model.login.LoginResponse
-import com.ggomg.imagebff.user.model.register.RegisterRequest
-import com.ggomg.imagebff.user.model.register.RegisterResponse
+import com.ggomg.imagebff.user.application.JwtAuthService
+import com.ggomg.imagebff.user.model.jwt.login.JwtLoginRequest
+import com.ggomg.imagebff.user.model.jwt.login.JwtLoginResponse
+import com.ggomg.imagebff.user.model.jwt.register.JwtRegisterRequest
+import com.ggomg.imagebff.user.model.jwt.register.JwtRegisterResponse
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
@@ -18,23 +18,23 @@ import kotlin.test.Test
 class AuthControllerTest {
 
     private lateinit var mockMvc: MockMvc
-    private lateinit var userService: UserService
+    private lateinit var jwtAuthService: JwtAuthService
     private val objectMapper = ObjectMapper()
 
     @BeforeEach
     fun setup() {
-        userService = mockk()
-        val authController = AuthController(userService)
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build()
+        jwtAuthService = mockk()
+        val jwtAuthController = JwtAuthController(jwtAuthService)
+        mockMvc = MockMvcBuilders.standaloneSetup(jwtAuthController).build()
     }
 
     @Test
     fun `회원가입 API - 성공`() {
         // given
-        val request = RegisterRequest("홍길동", "test@example.com", "password123")
-        val response = RegisterResponse(token = "register-token")
+        val request = JwtRegisterRequest("홍길동", "test@example.com", "password123")
+        val response = JwtRegisterResponse(token = "register-token")
 
-        every { userService.signUp(request) } returns response
+        every { jwtAuthService.signUp(request) } returns response
 
         // when & then
         mockMvc.post("/auth/register") {
@@ -49,10 +49,10 @@ class AuthControllerTest {
     @Test
     fun `로그인 API - 성공`() {
         // given
-        val request = LoginRequest("test@example.com", "password123")
-        val response = LoginResponse(token = "login-token")
+        val request = JwtLoginRequest("test@example.com", "password123")
+        val response = JwtLoginResponse(token = "login-token")
 
-        every { userService.login(request) } returns response
+        every { jwtAuthService.login(request) } returns response
 
         // when & then
         mockMvc.post("/auth/login") {

@@ -24,11 +24,10 @@ import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 
-//@Configuration
+@Configuration
 @EnableWebSecurity
 @EnableConfigurationProperties(JwtProperties::class)
-class JwtSecurityConfig(
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+class SessionSecurityConfig(
     private val registrationTemporaryTokenFilter: RegistrationTemporaryTokenFilter,
     private val oAuth2AuthenticationSuccessHandler: OAuth2AuthenticationSuccessHandler,
 ) {
@@ -79,12 +78,11 @@ class JwtSecurityConfig(
     fun defaultFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .securityMatcher("/**")
-            .cors { it.configurationSource(corsConfigurationSource()) } // ✅ 여기에 추가
+            .cors { it.configurationSource(corsConfigurationSource()) }
             .csrf { it.disable() }
             .sessionManagement {
-                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             }
-            .securityContext { it.securityContextRepository(NullSecurityContextRepository()) }
             .exceptionHandling { exceptions ->
                 exceptions.authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 exceptions.accessDeniedHandler(AccessDeniedHandlerImpl().apply {
@@ -109,7 +107,6 @@ class JwtSecurityConfig(
                         response.sendError(HttpStatus.UNAUTHORIZED.value(), "인증 실패: ${exception.message}")
                     }
             }
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }

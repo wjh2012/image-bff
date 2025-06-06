@@ -1,6 +1,6 @@
 package com.ggomg.imagebff.user.controller
 
-import com.ggomg.imagebff.user.application.UserService
+import com.ggomg.imagebff.user.application.JwtAuthService
 import com.ggomg.imagebff.user.model.login.LoginRequest
 import com.ggomg.imagebff.user.model.login.LoginResponse
 import com.ggomg.imagebff.user.model.register.RegisterRequest
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/auth")
-class AuthController(
-    private val authService: UserService,
+@RequestMapping("/jwt/auth")
+class JwtAuthController(
+    private val authService: JwtAuthService,
 ) {
 
     @PostMapping("/register")

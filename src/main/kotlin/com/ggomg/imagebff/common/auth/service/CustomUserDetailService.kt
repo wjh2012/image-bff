@@ -1,6 +1,7 @@
 package com.ggomg.imagebff.common.auth.service
 
 import com.ggomg.imagebff.common.auth.model.CustomUserDetails
+import com.ggomg.imagebff.user.domain.UserRepository
 import com.ggomg.imagebff.user.infrastructure.repository.UserJpaRepository
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -10,11 +11,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class CustomUserDetailService(
-    private val userJpaRepository: UserJpaRepository
+    private val userRepository: UserRepository
 ) : UserDetailsService {
 
     override fun loadUserByUsername(email: String): UserDetails {
-        val user = userJpaRepository.findByEmail(email) ?: throw UsernameNotFoundException("User not found")
+        val user = userRepository.findByEmail(email) ?: throw UsernameNotFoundException("User not found")
         val authorities = listOf(SimpleGrantedAuthority(user.userRole.name))
         return CustomUserDetails(user.id.toString(), user.password, authorities)
     }
