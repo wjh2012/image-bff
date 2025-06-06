@@ -1,7 +1,8 @@
 package com.ggomg.imagebff.user.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.ggomg.imagebff.user.application.JwtAuthService
+import com.ggomg.imagebff.auth.presentation.api.JwtAuthController
+import com.ggomg.imagebff.auth.application.JwtAuthService
 import com.ggomg.imagebff.user.model.jwt.login.JwtLoginRequest
 import com.ggomg.imagebff.user.model.jwt.login.JwtLoginResponse
 import com.ggomg.imagebff.user.model.jwt.register.JwtRegisterRequest

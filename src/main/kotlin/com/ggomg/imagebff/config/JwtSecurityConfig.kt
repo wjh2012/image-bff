@@ -1,12 +1,11 @@
 package com.ggomg.imagebff.config
 
-import com.ggomg.imagebff.common.auth.filter.JwtAuthenticationFilter
-import com.ggomg.imagebff.common.auth.filter.RegistrationTemporaryTokenFilter
-import com.ggomg.imagebff.common.auth.jwt.config.JwtProperties
-import com.ggomg.imagebff.common.auth.oauth2.OAuth2AuthenticationSuccessHandler
+import com.ggomg.imagebff.auth.security.filter.JwtAuthenticationFilter
+import com.ggomg.imagebff.auth.security.filter.RegistrationTemporaryTokenFilter
+import com.ggomg.imagebff.auth.security.jwt.config.JwtProperties
+import com.ggomg.imagebff.auth.security.oauth2.OAuth2AuthenticationSuccessHandler
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity

@@ -2,7 +2,7 @@ package com.ggomg.imagebff.user.service
 
 import BusinessException
 import com.ggomg.imagebff.common.auth.jwt.JwtTokenService
-import com.ggomg.imagebff.user.application.JwtAuthService
+import com.ggomg.imagebff.auth.application.JwtAuthService
 import com.ggomg.imagebff.user.domain.AuthType
 import com.ggomg.imagebff.user.domain.User
 import com.ggomg.imagebff.user.domain.UserRepository
