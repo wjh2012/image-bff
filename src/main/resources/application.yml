@@ -11,7 +11,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         show_sql: true
@@ -28,6 +28,11 @@ spring:
   config:
     import:
       - application-security.yml
+
+server:
+  servlet:
+    session:
+      persistent: false
 
 minio:
   url: http://192.168.45.131:9000

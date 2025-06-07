@@ -32,11 +32,10 @@ class ImageController(private val imageService: ImageService) {
     @PostMapping("/upload-urls")
     fun generatePresignedUrls(
         @AuthenticationPrincipal user: CustomUserDetails,
-        @RequestParam filenames: List<String>,
-        @RequestParam contentTypes: List<String>
+        @RequestBody request: UploadPresignedUrlRequest
     ): List<PresignedUploadUrl> {
         logger.info { "Checking for Principal: ${user.username}" }
-        return imageService.saveAll(user.username, filenames, contentTypes)
+        return imageService.saveAll(user.username, request.filenames, request.contentTypes)
     }
 
     @Operation(summary = "업로드 완료 알림 (단일)", description = "단일 이미지 업로드 완료를 알림")

@@ -1,38 +1,44 @@
 package com.ggomg.imagebff.config
 
-import com.ggomg.imagebff.auth.security.filter.RegistrationTemporaryTokenFilter
-import com.ggomg.imagebff.auth.security.jwt.RegistrationTokenService
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.ggomg.imagebff.auth.JsonUsernamePasswordAuthenticationConverter
 import com.ggomg.imagebff.auth.security.jwt.config.JwtProperties
-import com.ggomg.imagebff.auth.security.oauth2.OAuth2AuthenticationSuccessHandler
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.session.SessionRegistryImpl
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.access.AccessDeniedHandlerImpl
-import org.springframework.security.web.authentication.HttpStatusEntryPoint
+import org.springframework.security.web.authentication.AuthenticationFailureHandler
+import org.springframework.security.web.authentication.AuthenticationFilter
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.security.web.context.NullSecurityContextRepository
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository
+import org.springframework.security.web.session.HttpSessionEventPublisher
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
+private val logger = KotlinLogging.logger {}
 
 @Configuration
 @EnableWebSecurity
 @EnableConfigurationProperties(JwtProperties::class)
 class SessionSecurityConfig(
-    private val oAuth2AuthenticationSuccessHandler: OAuth2AuthenticationSuccessHandler,
+    private val objectMapper: ObjectMapper,
 ) {
+
 
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
@@ -52,77 +58,97 @@ class SessionSecurityConfig(
         return BCryptPasswordEncoder()
     }
 
-    @Bean
-    fun registerFilterChain(
-        http: HttpSecurity,
-        registrationTokenService: RegistrationTokenService,
-        userDetailsService: UserDetailsService
-    ): SecurityFilterChain {
-        http
-            .securityMatcher("/oauth2/sign-up/**")
-            .csrf { it.disable() }
-            .sessionManagement {
-                it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            }
-            .securityContext { it.securityContextRepository(NullSecurityContextRepository()) } // ✅ 세션 저장 방지
-            .oauth2Login(Customizer.withDefaults())
-            .authorizeHttpRequests {
-                it
-                    .requestMatchers(
-                        "/oauth2/sign-up/**"
-                    ).permitAll()
-                    .anyRequest().authenticated()
-            }
-            .formLogin { it.disable() }
-            .httpBasic { it.disable() }
-            .addFilterBefore(
-                RegistrationTemporaryTokenFilter(registrationTokenService, userDetailsService),
-                UsernamePasswordAuthenticationFilter::class.java
-            )
-
-        return http.build()
-    }
-
-    @Bean
-    fun defaultFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http
-            .securityMatcher("/**")
-            .cors { it.configurationSource(corsConfigurationSource()) }
-            .csrf { it.disable() }
-            .sessionManagement {
-                it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            }
-            .exceptionHandling { exceptions ->
-                exceptions.authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                exceptions.accessDeniedHandler(AccessDeniedHandlerImpl().apply {
-                })
-            }
-            .authorizeHttpRequests {
-                it
-                    .requestMatchers(
-                        "/v3/api-docs/**",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html",
-                        "/auth/**",
-                    ).permitAll()
-                    .anyRequest().authenticated()
-            }
-            .formLogin { it.disable() }
-            .httpBasic { it.disable() }
-            .oauth2Login {
-                it
-                    .successHandler(oAuth2AuthenticationSuccessHandler)
-                    .failureHandler { request, response, exception ->
-                        response.sendError(HttpStatus.UNAUTHORIZED.value(), "인증 실패: ${exception.message}")
-                    }
-            }
-
-        return http.build()
-    }
 
     @Bean
     fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager {
         return authenticationConfiguration.authenticationManager
     }
+
+    @Bean
+    fun sessionRegistry(): SessionRegistryImpl = SessionRegistryImpl()
+
+
+    @Bean
+    fun httpSessionEventPublisher(): HttpSessionEventPublisher = HttpSessionEventPublisher()
+
+    @Bean
+    fun jsonUsernamePasswordAuthenticationConverter(): JsonUsernamePasswordAuthenticationConverter {
+        return JsonUsernamePasswordAuthenticationConverter(objectMapper)
+    }
+
+    @Bean
+    fun defaultFilterChain(http: HttpSecurity, authManager: AuthenticationManager): SecurityFilterChain {
+
+        val authenticationFilter =
+            AuthenticationFilter(authManager, jsonUsernamePasswordAuthenticationConverter()).apply {
+                setRequestMatcher(AntPathRequestMatcher("/auth/login", "POST"))
+                setSuccessHandler(jsonAuthenticationSuccessHandler())
+                setFailureHandler(jsonAuthenticationFailureHandler())
+            }
+        
+        http
+            .cors { it.configurationSource(corsConfigurationSource()) }
+            .csrf { it.disable() }
+            .sessionManagement {
+                it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            }
+            .securityContext {
+                it.securityContextRepository(HttpSessionSecurityContextRepository())
+            }
+            .authorizeHttpRequests {
+                it.requestMatchers(
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/auth/**",
+                    "/login" // 명시적 permitAll 추가
+                ).permitAll().anyRequest().authenticated()
+            }
+            .formLogin { it.disable() }
+            .httpBasic { it.disable() }
+            .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+
+        return http.build()
+    }
+
+    @Bean
+    fun jsonAuthenticationSuccessHandler(): AuthenticationSuccessHandler =
+        AuthenticationSuccessHandler { request, response, authentication ->
+            logger.info("Authentication success for user={}", authentication.name)
+
+            // 세션에 SecurityContext 저장
+            val context = SecurityContextHolder.createEmptyContext().apply {
+                this.authentication = authentication
+            }
+            HttpSessionSecurityContextRepository().saveContext(context, request, response)
+
+            response.apply {
+                status = HttpStatus.OK.value()
+                contentType = MediaType.APPLICATION_JSON_VALUE
+            }
+            objectMapper.writeValue(
+                response.outputStream, mapOf(
+                    "status" to "success",
+                    "user" to authentication.name
+                )
+            )
+        }
+
+    @Bean
+    fun jsonAuthenticationFailureHandler(): AuthenticationFailureHandler =
+        AuthenticationFailureHandler { request, response, exception ->
+            logger.error("Authentication failure: {}", exception.message, exception)
+
+            response.apply {
+                status = HttpStatus.UNAUTHORIZED.value()
+                contentType = MediaType.APPLICATION_JSON_VALUE
+            }
+            objectMapper.writeValue(
+                response.writer, mapOf(
+                    "status" to "failure",
+                    "error" to exception.message
+                )
+            )
+        }
 
 }

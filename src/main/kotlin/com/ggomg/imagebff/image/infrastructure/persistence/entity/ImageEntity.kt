@@ -44,7 +44,7 @@ class ImageEntity(
         fun fromDomain(image: Image): ImageEntity =
             ImageEntity(
                 id = image.id,
-                userId = image.id,
+                userId = image.userId,
                 imageCreatedAt = image.imageCreatedAt,
                 filename = image.filename,
                 contentType = image.contentType,
