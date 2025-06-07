@@ -85,7 +85,7 @@ class SessionSecurityConfig(
                 setSuccessHandler(jsonAuthenticationSuccessHandler())
                 setFailureHandler(jsonAuthenticationFailureHandler())
             }
-        
+
         http
             .cors { it.configurationSource(corsConfigurationSource()) }
             .csrf { it.disable() }
@@ -114,7 +114,7 @@ class SessionSecurityConfig(
     @Bean
     fun jsonAuthenticationSuccessHandler(): AuthenticationSuccessHandler =
         AuthenticationSuccessHandler { request, response, authentication ->
-            logger.info("Authentication success for user={}", authentication.name)
+            logger.info { "${"Authentication success for user={}"} ${authentication.name}" }
 
             // 세션에 SecurityContext 저장
             val context = SecurityContextHolder.createEmptyContext().apply {
@@ -137,7 +137,7 @@ class SessionSecurityConfig(
     @Bean
     fun jsonAuthenticationFailureHandler(): AuthenticationFailureHandler =
         AuthenticationFailureHandler { request, response, exception ->
-            logger.error("Authentication failure: {}", exception.message, exception)
+            logger.info { "${"Authentication failure: {}"} ${exception.message} $exception" }
 
             response.apply {
                 status = HttpStatus.UNAUTHORIZED.value()
