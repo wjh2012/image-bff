@@ -7,6 +7,7 @@ class Task(
     val id: UUID,
     val userId: UUID,
     var name: String,
+    var status: TaskState = RegisteredState,
     val createdAt: LocalDateTime,
     var updatedAt: LocalDateTime
 ) {
@@ -15,4 +16,19 @@ class Task(
         this.name = newName
         this.updatedAt = LocalDateTime.now()
     }
+
+    /** 큐에 등록(RegisteredState → QueuedState) */
+    fun enqueue() = status.enqueue(this)
+
+    /** 실행 시작(QueuedState → InProgressState) */
+    fun start() = status.start(this)
+
+    /** 실행 완료(InProgressState → CompletedState) */
+    fun complete() = status.complete(this)
+
+    /** 실행 실패(InProgressState → FailedState) */
+    fun fail() = status.fail(this)
+
+    /** 실패 후 재시도(FailedState → RegisteredState) */
+    fun retry() = status.retry(this)
 }
