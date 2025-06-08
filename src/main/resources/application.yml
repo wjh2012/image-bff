@@ -35,7 +35,7 @@ server:
       persistent: false
 
 minio:
-  url: http://192.168.45.131:9000
+  url: http://localhost:9000
   access-key: admin
   secret-key: adminadmin
   bucket: example-bucket

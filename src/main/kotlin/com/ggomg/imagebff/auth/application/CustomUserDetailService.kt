@@ -19,9 +19,10 @@ class CustomUserDetailService(
     override fun loadUserByUsername(email: String): UserDetails {
         logger.info { "사용자 조회: ${email}" }
 
-        val user = userRepository.findByEmail(email) ?: throw UsernameNotFoundException("User not found")
+        val user =
+            userRepository.findByEmail(email) ?: throw UsernameNotFoundException("User not found")
         val authorities = listOf(SimpleGrantedAuthority(user.userRole.name))
-        return CustomUserDetails(user.email, user.password, authorities)
+        return CustomUserDetails(user.id, user.email, user.password, authorities)
     }
 
 }

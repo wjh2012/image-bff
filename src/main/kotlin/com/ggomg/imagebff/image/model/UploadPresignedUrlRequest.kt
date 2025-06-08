@@ -1,4 +1,4 @@
-package com.ggomg.imagebff.image.presentation
+package com.ggomg.imagebff.image.model
 
 data class UploadPresignedUrlRequest(
     val filenames: List<String>,

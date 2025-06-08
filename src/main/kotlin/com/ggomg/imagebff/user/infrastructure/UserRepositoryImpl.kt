@@ -7,6 +7,7 @@ import com.ggomg.imagebff.user.infrastructure.repository.UserJpaRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
+import java.util.UUID
 
 private val logger = KotlinLogging.logger {}
 
@@ -15,6 +16,12 @@ class UserRepositoryImpl(
     private val userJpaRepository: UserJpaRepository,
     private val userMapper: UserMapper
 ) : UserRepository {
+
+    override fun findById(id: UUID): User? {
+        val userEntity = userJpaRepository.findByIdOrNull(id)
+            ?: throw IllegalArgumentException("User not found.")
+        return userMapper.toDomain(userEntity)
+    }
 
     override fun findByEmail(email: String): User? {
         logger.info { "Checking for user: $email" }
@@ -29,8 +36,9 @@ class UserRepositoryImpl(
         return userDomain
     }
 
-    override fun delete(id: Long) {
-        val userEntity = userJpaRepository.findByIdOrNull(id) ?: throw IllegalArgumentException("User not found")
+    override fun delete(id: UUID) {
+        val userEntity =
+            userJpaRepository.findByIdOrNull(id) ?: throw IllegalArgumentException("User not found")
         userJpaRepository.delete(userEntity)
     }
 

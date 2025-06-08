@@ -3,6 +3,7 @@ package com.ggomg.imagebff.image.presentation
 import com.ggomg.imagebff.auth.model.CustomUserDetails
 import com.ggomg.imagebff.image.application.ImageService
 import com.ggomg.imagebff.image.model.PresignedUploadUrl
+import com.ggomg.imagebff.image.model.UploadPresignedUrlRequest
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -18,7 +19,10 @@ private val logger = KotlinLogging.logger {}
 @RequestMapping("/image")
 class ImageController(private val imageService: ImageService) {
 
-    @Operation(summary = "단일 이미지 uploadPresignedURL 요청", description = "단일 이미지 presigned upload URL 요청")
+    @Operation(
+        summary = "단일 이미지 uploadPresignedURL 요청",
+        description = "단일 이미지 presigned upload URL 요청"
+    )
     @PostMapping("/upload-url")
     fun generatePresignedUrl(
         @AuthenticationPrincipal user: CustomUserDetails,
@@ -28,7 +32,10 @@ class ImageController(private val imageService: ImageService) {
         return imageService.save(user.username, filename, contentType)
     }
 
-    @Operation(summary = "다중 이미지 uploadPresignedURL 요청", description = "다중 이미지 presigned upload URL 요청")
+    @Operation(
+        summary = "다중 이미지 uploadPresignedURL 요청",
+        description = "다중 이미지 presigned upload URL 요청"
+    )
     @PostMapping("/upload-urls")
     fun generatePresignedUrls(
         @AuthenticationPrincipal user: CustomUserDetails,
@@ -57,7 +64,10 @@ class ImageController(private val imageService: ImageService) {
         imageService.confirmAllUploads(user.username, imageIds)
     }
 
-    @Operation(summary = "단일 이미지 downloadPresignedURL 요청", description = "단일 이미지 다운로드용 presigned URL 요청")
+    @Operation(
+        summary = "단일 이미지 downloadPresignedURL 요청",
+        description = "단일 이미지 다운로드용 presigned URL 요청"
+    )
     @GetMapping("/{imageId}")
     fun getPresignedDownloadUrl(
         @AuthenticationPrincipal user: CustomUserDetails,
@@ -66,7 +76,10 @@ class ImageController(private val imageService: ImageService) {
         return imageService.read(user.username, imageId)
     }
 
-    @Operation(summary = "다중 이미지 downloadPresignedURL 요청", description = "다중 이미지 다운로드용 presigned URL 요청")
+    @Operation(
+        summary = "다중 이미지 downloadPresignedURL 요청",
+        description = "다중 이미지 다운로드용 presigned URL 요청"
+    )
     @PostMapping("/downloads")
     fun getPresignedDownloadUrls(
         @AuthenticationPrincipal user: CustomUserDetails,
