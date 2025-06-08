@@ -6,7 +6,7 @@ import java.util.UUID
 class Task(
     val id: UUID,
     val userId: UUID,
-    private var name: String,
+    var name: String,
     val createdAt: LocalDateTime,
     var updatedAt: LocalDateTime
 ) {
