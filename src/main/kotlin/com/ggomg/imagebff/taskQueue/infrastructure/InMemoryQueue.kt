@@ -82,6 +82,10 @@ class InMemoryQueue(
 
     /** 워커가 처리할 다음 Task 반환 */
     fun pollNext(): Task? = globalQueue.poll()
+
+    fun take(): Task {
+        return globalQueue.take() // 이건 진짜 block됨
+    }
 }
 
 /**
