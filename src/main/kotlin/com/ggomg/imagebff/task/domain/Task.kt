@@ -1,21 +1,37 @@
 package com.ggomg.imagebff.task.domain
 
+import com.fasterxml.uuid.Generators
+import com.ggomg.imagebff.image.domain.Image
 import java.time.LocalDateTime
 import java.util.UUID
 
 class Task(
-    val id: UUID,
-    val userId: UUID,
-    var name: String,
-    var status: TaskState = RegisteredState,
-    val createdAt: LocalDateTime,
-    var updatedAt: LocalDateTime
+    private val id: UUID,
+    private val userId: UUID,
+    private var name: String,
+    private var status: TaskState = RegisteredState,
+    private val createdAt: LocalDateTime,
+    private var updatedAt: LocalDateTime,
+    private val taskImages: MutableList<TaskImage> = mutableListOf()
 ) {
     fun changeName(newName: String) {
         require(newName.isNotBlank()) { "이름은 비어 있을 수 없습니다." }
         this.name = newName
         this.updatedAt = LocalDateTime.now()
     }
+
+    fun addImage(image: Image) {
+        // 중복 이미지 방지
+        if (taskImages.any { it.imageId == image.id }) {
+            throw IllegalArgumentException("이미 추가된 이미지입니다.")
+        }
+        val generatedUUID = Generators.timeBasedEpochGenerator().generate()
+        taskImages.add(TaskImage(generatedUUID, id, image.id))
+    }
+
+    fun getUserId(): UUID = userId
+
+    fun getTaskImages(): List<TaskImage> = taskImages.toList()
 
     /** 큐에 등록(RegisteredState → QueuedState) */
     fun enqueue() = status.enqueue(this)
