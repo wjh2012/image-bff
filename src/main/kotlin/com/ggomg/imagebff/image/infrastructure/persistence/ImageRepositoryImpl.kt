@@ -22,9 +22,6 @@ class ImageRepositoryImpl(
         imageJpaRepository.saveAll(entities)
     }
 
-    override fun read(id: UUID): Image {
-        val entity = imageJpaRepository.findById(id)
-            .orElseThrow { IllegalArgumentException("이미지 ID=$id 를 찾을 수 없습니다.") }
-        return entity.toDomain()
-    }
+    override fun findById(id: UUID): Image? =
+        imageJpaRepository.findById(id).map { it.toDomain() }.orElse(null)
 }

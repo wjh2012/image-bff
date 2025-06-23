@@ -56,28 +56,32 @@ class ImageService(
     }
 
     fun read(userId: String, imageId: UUID): PresignedUploadUrl {
-        val image = imageRepository.read(imageId)
+        val image = imageRepository.findById(imageId)
+            ?: throw IllegalArgumentException("이미지 ID=$imageId 를 찾을 수 없습니다.")
         val presignedUrl = imageStorage.generateDownloadPresignedUrl(image)
         return presignedUrl
     }
 
     fun readAll(userId: String, imageIds: List<UUID>): List<PresignedUploadUrl> {
         return imageIds.map { id ->
-            val image = imageRepository.read(id)
+            val image = imageRepository.findById(id)
+                ?: throw IllegalArgumentException("이미지 ID=$id 를 찾을 수 없습니다.")
             val presignedUrl = imageStorage.generateDownloadPresignedUrl(image)
             presignedUrl
         }
     }
 
     fun confirmUpload(userId: String, imageId: UUID) {
-        val image = imageRepository.read(imageId)
+        val image = imageRepository.findById(imageId)
+            ?: throw IllegalArgumentException("이미지 ID=$imageId 를 찾을 수 없습니다.")
         image.markUploaded()
         imageRepository.save(image)
     }
 
     fun confirmAllUploads(userId: String, imageIds: List<UUID>) {
         val images = imageIds.map { id ->
-            val image = imageRepository.read(id)
+            val image = imageRepository.findById(id)
+                ?: throw IllegalArgumentException("이미지 ID=$id 를 찾을 수 없습니다.")
             image.markUploaded()
             image
         }
