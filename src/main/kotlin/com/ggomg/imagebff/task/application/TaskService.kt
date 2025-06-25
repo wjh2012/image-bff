@@ -64,13 +64,7 @@ class TaskService(
         if (task.getUserId() != userId || images.values.any { it.userId != userId }) {
             throw IllegalAccessException("다른 사용자의 리소스에 접근할 수 없습니다.")
         }
-
-        // 3. 중복 추가 방지
-        val existingImageIds = task.getTaskImages().map { it.imageId }.toSet()
-        val newImages = images.values.filterNot { existingImageIds.contains(it.id) }
-
-        // 4. Task에 이미지 추가
-        newImages.forEach { task.addImage(it) }
+        imageIds.forEach { task.addImage(it) }
 
         taskRepository.save(task)
     }

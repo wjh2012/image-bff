@@ -1,9 +1,8 @@
 package com.ggomg.imagebff.task.domain
 
 import com.fasterxml.uuid.Generators
-import com.ggomg.imagebff.image.domain.Image
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 class Task(
     private val id: UUID,
@@ -14,37 +13,42 @@ class Task(
     private var updatedAt: LocalDateTime,
     private val taskImages: MutableList<TaskImage> = mutableListOf()
 ) {
+
     fun changeName(newName: String) {
         require(newName.isNotBlank()) { "이름은 비어 있을 수 없습니다." }
         this.name = newName
         this.updatedAt = LocalDateTime.now()
     }
 
-    fun addImage(image: Image) {
-        // 중복 이미지 방지
-        if (taskImages.any { it.imageId == image.id }) {
+    fun addImage(imageId: UUID) {
+        if (taskImages.any { it.imageId == imageId }) {
             throw IllegalArgumentException("이미 추가된 이미지입니다.")
         }
         val generatedUUID = Generators.timeBasedEpochGenerator().generate()
-        taskImages.add(TaskImage(generatedUUID, id, image.id))
+        taskImages.add(TaskImage(generatedUUID, id, imageId))
+        this.updatedAt = LocalDateTime.now()
+    }
+
+    fun removeImage(taskImageId: UUID) {
+        val removed = taskImages.removeIf { it.id == taskImageId }
+        if (!removed) throw IllegalArgumentException("해당 이미지 연결을 찾을 수 없습니다.")
+        this.updatedAt = LocalDateTime.now()
     }
 
     fun getUserId(): UUID = userId
-
     fun getTaskImages(): List<TaskImage> = taskImages.toList()
+    fun getId(): UUID = id
+    fun getStatus(): TaskState = status
 
-    /** 큐에 등록(RegisteredState → QueuedState) */
+    // 상태 전이 메서드
+    internal fun transitionTo(newState: TaskState) {
+        this.status = newState
+        this.updatedAt = LocalDateTime.now()
+    }
+
     fun enqueue() = status.enqueue(this)
-
-    /** 실행 시작(QueuedState → InProgressState) */
     fun start() = status.start(this)
-
-    /** 실행 완료(InProgressState → CompletedState) */
     fun complete() = status.complete(this)
-
-    /** 실행 실패(InProgressState → FailedState) */
     fun fail() = status.fail(this)
-
-    /** 실패 후 재시도(FailedState → RegisteredState) */
     fun retry() = status.retry(this)
 }

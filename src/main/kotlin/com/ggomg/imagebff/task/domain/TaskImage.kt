@@ -6,6 +6,5 @@ class TaskImage(
     val id: UUID,
     val taskId: UUID,
     val imageId: UUID,
-    val isRepresentative: Boolean = false,
 ) {
 }
