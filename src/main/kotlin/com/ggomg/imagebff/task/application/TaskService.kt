@@ -7,7 +7,6 @@ import com.ggomg.imagebff.image.exception.ImageErrorCode
 import com.ggomg.imagebff.task.domain.Task
 import com.ggomg.imagebff.task.domain.TaskRepository
 import com.ggomg.imagebff.task.exception.TaskErrorCode
-import com.ggomg.imagebff.user.domain.UserRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.UUID
@@ -15,12 +14,9 @@ import java.util.UUID
 @Service
 class TaskService(
     private val taskRepository: TaskRepository,
-    private val userRepository: UserRepository,
     private val imageRepository: ImageRepository,
 ) {
     fun save(userId: UUID, taskName: String) {
-        userRepository.findById(userId) ?: throw IllegalArgumentException("User not found.")
-
         val generatedUUID = Generators.timeBasedEpochGenerator().generate()
         val createdAt = LocalDateTime.now()
 
@@ -48,7 +44,7 @@ class TaskService(
     }
 
     fun addImagesToTask(userId: UUID, taskId: UUID, imageIds: List<UUID>) {
-        val task = taskRepository.findById(taskId)
+        val task = taskRepository.findByUserIdAndId(userId, taskId)
             ?: throw BusinessException(TaskErrorCode.TASK_NOT_FOUND)
 
         val images = imageRepository.findAllByIds(imageIds)
@@ -70,19 +66,15 @@ class TaskService(
     }
 
     fun changeTaskName(userId: UUID, taskId: UUID, newName: String) {
-        userRepository.findById(userId) ?: throw IllegalArgumentException("User not found.")
-
         val task =
-            taskRepository.findById(taskId) ?: throw IllegalArgumentException("Task not found.")
+            taskRepository.findByUserIdAndId(userId, taskId) ?: throw IllegalArgumentException("Task not found.")
         task.changeName(newName)
         taskRepository.save(task)
     }
 
     fun delete(userId: UUID, taskId: UUID) {
-        userRepository.findById(userId) ?: throw IllegalArgumentException("User not found.")
-
         val task =
-            taskRepository.findById(taskId) ?: throw IllegalArgumentException("Task not found.")
+            taskRepository.findByUserIdAndId(userId, taskId) ?: throw IllegalArgumentException("Task not found.")
         taskRepository.delete(task)
     }
 

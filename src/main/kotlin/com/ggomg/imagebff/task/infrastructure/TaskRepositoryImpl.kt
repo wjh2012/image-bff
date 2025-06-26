@@ -15,8 +15,15 @@ class TaskRepositoryImpl(
 
     override fun findById(id: UUID): Task? {
         val taskEntity = taskJpaRepository.findByIdOrNull(id)
-            ?: throw IllegalArgumentException("User not found.")
-        return TaskMapper.toDomain(taskEntity)
+        return taskEntity?.let { TaskMapper.toDomain(taskEntity) }
+    }
+
+    override fun findByUserIdAndId(
+        userId: UUID,
+        id: UUID
+    ): Task? {
+        val taskEntity = taskJpaRepository.findByUserIdAndIdNull(userId, id)
+        return taskEntity?.let { TaskMapper.toDomain(taskEntity) }
     }
 
     override fun save(task: Task): Task {

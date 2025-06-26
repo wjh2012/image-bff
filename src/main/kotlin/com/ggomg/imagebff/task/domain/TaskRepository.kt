@@ -6,6 +6,8 @@ interface TaskRepository {
 
     fun findById(id: UUID): Task?
 
+    fun findByUserIdAndId(userId: UUID, id: UUID): Task?
+
     fun save(task: Task): Task
 
     fun delete(task: Task)
