@@ -16,68 +16,54 @@ class TaskService(
     private val taskRepository: TaskRepository,
     private val imageRepository: ImageRepository,
 ) {
-    fun save(userId: UUID, taskName: String) {
-        val generatedUUID = Generators.timeBasedEpochGenerator().generate()
-        val createdAt = LocalDateTime.now()
 
+    fun save(userId: UUID, taskName: String) {
         val task = Task(
-            id = generatedUUID,
+            id = Generators.timeBasedEpochGenerator().generate(),
             userId = userId,
             name = taskName,
-            createdAt = createdAt,
-            updatedAt = createdAt,
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now(),
         )
-
         taskRepository.save(task)
     }
 
     fun addImageToTask(userId: UUID, taskId: UUID, imageId: UUID) {
-        val task = taskRepository.findById(taskId) ?: throw BusinessException(TaskErrorCode.TASK_NOT_FOUND)
-        val image = imageRepository.findById(imageId) ?: throw BusinessException(ImageErrorCode.IMAGE_NOT_FOUND)
+        val task = getTaskForUser(userId, taskId)
+        val image = imageRepository.findByUserIdAndId(userId, imageId)
+            ?: throw BusinessException(ImageErrorCode.IMAGE_NOT_FOUND)
 
-        // 사용자 권한 검사
-        if (task.getUserId() != userId || image.userId != userId) {
-            throw BusinessException(TaskErrorCode.IMAGE_FORBIDDEN)
-        }
-
+        task.addImage(image.id)
         taskRepository.save(task)
     }
 
     fun addImagesToTask(userId: UUID, taskId: UUID, imageIds: List<UUID>) {
-        val task =
-            taskRepository.findByUserIdAndId(userId, taskId) ?: throw BusinessException(TaskErrorCode.TASK_NOT_FOUND)
+        val task = getTaskForUser(userId, taskId)
+        val images = imageRepository.findAllByUserIdAndIdIn(userId, imageIds)
+            .associateBy { it.id }
 
-        val images = imageRepository.findAllByIds(imageIds)
-            .associateBy { it.id } // Map<UUID, Image>
-
-        // 1. 존재하지 않는 이미지 ID 사전 필터링
         val notFoundIds = imageIds.filterNot { images.containsKey(it) }
         if (notFoundIds.isNotEmpty()) {
             throw BusinessException(ImageErrorCode.IMAGE_NOT_FOUND)
         }
 
-        // 2. 권한 체크 한 번에
-        if (task.getUserId() != userId || images.values.any { it.userId != userId }) {
-            throw BusinessException(TaskErrorCode.IMAGE_FORBIDDEN)
-        }
         imageIds.forEach { task.addImage(it) }
-
         taskRepository.save(task)
     }
 
     fun changeTaskName(userId: UUID, taskId: UUID, newName: String) {
-        val task =
-            taskRepository.findByUserIdAndId(userId, taskId)
-                ?: throw IllegalArgumentException("Task not found.")
+        val task = getTaskForUser(userId, taskId)
         task.changeName(newName)
         taskRepository.save(task)
     }
 
     fun delete(userId: UUID, taskId: UUID) {
-        val task =
-            taskRepository.findByUserIdAndId(userId, taskId)
-                ?: throw IllegalArgumentException("Task not found.")
+        val task = getTaskForUser(userId, taskId)
         taskRepository.delete(task)
     }
 
+    private fun getTaskForUser(userId: UUID, taskId: UUID): Task {
+        return taskRepository.findByUserIdAndId(userId, taskId)
+            ?: throw BusinessException(TaskErrorCode.TASK_NOT_FOUND)
+    }
 }
