@@ -1,18 +1,14 @@
 package com.ggomg.imagebff.task.application
 
 import BusinessException
-import com.ggomg.imagebff.image.domain.ImageRepository
 import com.ggomg.imagebff.task.domain.TaskRepository
 import com.ggomg.imagebff.task.exception.TaskErrorCode
-import com.ggomg.imagebff.user.domain.UserRepository
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
 class QueueService(
     private val taskRepository: TaskRepository,
-    private val userRepository: UserRepository,
-    private val imageRepository: ImageRepository,
 ) {
 
     fun enqueueTask(userId: UUID, taskId: UUID) {
