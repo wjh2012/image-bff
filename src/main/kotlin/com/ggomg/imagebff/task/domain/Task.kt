@@ -35,9 +35,12 @@ class Task(
         this.updatedAt = LocalDateTime.now()
     }
 
-    fun getUserId(): UUID = userId
-    fun getTaskImages(): List<TaskImage> = taskImages.toList()
     fun getId(): UUID = id
+    fun getUserId(): UUID = userId
+    fun getName(): String = name
+    fun getCreatedAt(): LocalDateTime = createdAt
+    fun getUpdatedAt(): LocalDateTime = updatedAt
+    fun getTaskImages(): List<TaskImage> = taskImages.toList()
     fun getStatus(): TaskState = status
 
     // 상태 전이 메서드

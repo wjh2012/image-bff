@@ -15,10 +15,10 @@ object TaskMapper {
 
     fun toEntity(task: Task): TaskEntity =
         TaskEntity(
-            id = task.id,
-            userId = task.userId,
-            name = task.name,
-            taskCreatedAt = task.createdAt,
-            taskModifiedAt = task.updatedAt
+            id = task.getId(),
+            userId = task.getUserId(),
+            name = task.getName(),
+            taskCreatedAt = task.getCreatedAt(),
+            taskModifiedAt = task.getUpdatedAt()
         )
 }
