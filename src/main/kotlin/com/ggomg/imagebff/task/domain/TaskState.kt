@@ -37,9 +37,8 @@ object QueuedState : TaskState() {
 
 // 3. InProgress
 object InProgressState : TaskState() {
-    override fun enqueue(task: Task) = already()
+    override fun enqueue(task: Task) = invalid("이미 시작한 작업은 되돌릴 수 없습니다.")
     override fun start(task: Task) = already()
-
     override fun complete(task: Task) {
         task.transitionTo(CompletedState)
     }
@@ -57,7 +56,6 @@ object FailedState : TaskState() {
     override fun start(task: Task) = invalid("실패된 작업은 재시도로만 실행 가능합니다.")
     override fun complete(task: Task) = invalid("실패된 작업은 바로 완료할 수 없습니다.")
     override fun fail(task: Task) = already()
-
     override fun retry(task: Task) {
         task.transitionTo(RegisteredState)
     }
@@ -66,7 +64,7 @@ object FailedState : TaskState() {
 // 5. Completed
 object CompletedState : TaskState() {
     override fun enqueue(task: Task) = invalid("완료된 작업은 큐에 진입할 수 없습니다.")
-    override fun start(task: Task) = already()
+    override fun start(task: Task) = invalid("완료된 작업은 큐에 시작할 수 없습니다.")
     override fun complete(task: Task) = already()
     override fun fail(task: Task) = invalid("완료된 작업은 실패 상태로 전이할 수 없습니다.")
     override fun retry(task: Task) = invalid("완료된 작업은 재시도할 수 없습니다.")
