@@ -37,15 +37,15 @@ class TaskService(
 
         // 사용자 권한 검사
         if (task.getUserId() != userId || image.userId != userId) {
-            throw IllegalAccessException("다른 사용자의 리소스에 접근할 수 없습니다.")
+            throw BusinessException(TaskErrorCode.IMAGE_FORBIDDEN)
         }
 
         taskRepository.save(task)
     }
 
     fun addImagesToTask(userId: UUID, taskId: UUID, imageIds: List<UUID>) {
-        val task = taskRepository.findByUserIdAndId(userId, taskId)
-            ?: throw BusinessException(TaskErrorCode.TASK_NOT_FOUND)
+        val task =
+            taskRepository.findByUserIdAndId(userId, taskId) ?: throw BusinessException(TaskErrorCode.TASK_NOT_FOUND)
 
         val images = imageRepository.findAllByIds(imageIds)
             .associateBy { it.id } // Map<UUID, Image>
@@ -58,7 +58,7 @@ class TaskService(
 
         // 2. 권한 체크 한 번에
         if (task.getUserId() != userId || images.values.any { it.userId != userId }) {
-            throw IllegalAccessException("다른 사용자의 리소스에 접근할 수 없습니다.")
+            throw BusinessException(TaskErrorCode.IMAGE_FORBIDDEN)
         }
         imageIds.forEach { task.addImage(it) }
 
@@ -67,14 +67,16 @@ class TaskService(
 
     fun changeTaskName(userId: UUID, taskId: UUID, newName: String) {
         val task =
-            taskRepository.findByUserIdAndId(userId, taskId) ?: throw IllegalArgumentException("Task not found.")
+            taskRepository.findByUserIdAndId(userId, taskId)
+                ?: throw IllegalArgumentException("Task not found.")
         task.changeName(newName)
         taskRepository.save(task)
     }
 
     fun delete(userId: UUID, taskId: UUID) {
         val task =
-            taskRepository.findByUserIdAndId(userId, taskId) ?: throw IllegalArgumentException("Task not found.")
+            taskRepository.findByUserIdAndId(userId, taskId)
+                ?: throw IllegalArgumentException("Task not found.")
         taskRepository.delete(task)
     }
 
