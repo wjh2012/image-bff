@@ -11,23 +11,22 @@ import java.util.UUID
 @Repository
 class TaskRepositoryImpl(
     private val taskJpaRepository: TaskJpaRepository,
-    private val taskMapper: TaskMapper
 ) : TaskRepository {
 
     override fun findById(id: UUID): Task? {
         val taskEntity = taskJpaRepository.findByIdOrNull(id)
             ?: throw IllegalArgumentException("User not found.")
-        return taskMapper.toDomain(taskEntity)
+        return TaskMapper.toDomain(taskEntity)
     }
 
     override fun save(task: Task): Task {
-        val taskEntity = taskMapper.toEntity(task)
+        val taskEntity = TaskMapper.toEntity(task)
         val savedTaskEntity = taskJpaRepository.save(taskEntity)
-        return taskMapper.toDomain(savedTaskEntity)
+        return TaskMapper.toDomain(savedTaskEntity)
     }
 
     override fun delete(task: Task) {
-        val taskEntity = taskMapper.toEntity(task)
+        val taskEntity = TaskMapper.toEntity(task)
         taskJpaRepository.delete(taskEntity)
     }
 }
