@@ -4,6 +4,7 @@ import com.ggomg.imagebff.image.domain.Image
 import com.ggomg.imagebff.image.domain.ImageRepository
 import com.ggomg.imagebff.image.infrastructure.persistence.entity.ImageEntity
 import com.ggomg.imagebff.image.infrastructure.persistence.repository.ImageJpaRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
@@ -13,15 +14,32 @@ class ImageRepositoryImpl(
 ) : ImageRepository {
 
     override fun save(image: Image) {
-        val entity = ImageEntity.Companion.fromDomain(image)
+        val entity = ImageEntity.fromDomain(image)
         imageJpaRepository.save(entity)
     }
 
     override fun saveAll(images: List<Image>) {
-        val entities = images.map { ImageEntity.Companion.fromDomain(it) }
+        val entities = images.map { ImageEntity.fromDomain(it) }
         imageJpaRepository.saveAll(entities)
     }
 
     override fun findById(id: UUID): Image? =
-        imageJpaRepository.findById(id).map { it.toDomain() }.orElse(null)
+        imageJpaRepository.findByIdOrNull(id)?.toDomain()
+
+    override fun findAllByIds(ids: List<UUID>) =
+        imageJpaRepository.findAllById(ids).map { it.toDomain() }
+
+    override fun findByUserIdAndId(
+        userId: UUID,
+        id: UUID
+    ): Image? {
+        return imageJpaRepository.findByUserIdAndId(userId, id)?.toDomain()
+    }
+
+    override fun findAllByUserIdAndIdIn(
+        userId: UUID,
+        ids: List<UUID>
+    ): List<Image> {
+        return imageJpaRepository.findAllByUserIdAndIdIn(userId, ids).map { it.toDomain() }
+    }
 }
