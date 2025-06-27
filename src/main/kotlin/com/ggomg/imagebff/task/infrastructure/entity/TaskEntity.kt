@@ -18,14 +18,14 @@ class TaskEntity(
     val userId: UUID,
 
     @Column(name = "name", nullable = false)
-    val name: String,
+    var name: String,
 
     @Column
-    val status: String,
+    var status: String,
 
     @Column
     val taskCreatedAt: LocalDateTime,
 
     @Column
-    val taskModifiedAt: LocalDateTime,
+    var taskModifiedAt: LocalDateTime,
 ) : BaseEntity()
