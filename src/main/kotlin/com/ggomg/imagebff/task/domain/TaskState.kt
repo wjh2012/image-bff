@@ -78,3 +78,22 @@ private fun invalid(message: String): Nothing {
 private fun already(): Nothing {
     throw BusinessException(TaskErrorCode.ALREADY_IN_TARGET_STATE, "이미 해당 상태입니다.")
 }
+
+fun mapStateToStatus(state: TaskState): String =
+    when (state) {
+        RegisteredState -> "REGISTERED"
+        QueuedState -> "QUEUED"
+        InProgressState -> "IN_PROGRESS"
+        CompletedState -> "COMPLETED"
+        FailedState -> "FAILED"
+    }
+
+fun mapStatusToState(status: String): TaskState =
+    when (status.uppercase()) {
+        "REGISTERED" -> RegisteredState
+        "QUEUED" -> QueuedState
+        "IN_PROGRESS" -> InProgressState
+        "COMPLETED" -> CompletedState
+        "FAILED" -> FailedState
+        else -> throw IllegalArgumentException("Unknown status: $status")
+    }

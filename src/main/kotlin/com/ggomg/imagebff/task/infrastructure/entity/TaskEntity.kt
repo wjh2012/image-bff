@@ -1,7 +1,6 @@
 package com.ggomg.imagebff.task.infrastructure.entity
 
 import com.ggomg.imagebff.common.base.BaseEntity
-import com.ggomg.imagebff.task.domain.Task
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -20,6 +19,9 @@ class TaskEntity(
 
     @Column(name = "name", nullable = false)
     val name: String,
+
+    @Column
+    val status: String,
 
     @Column
     val taskCreatedAt: LocalDateTime,
