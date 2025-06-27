@@ -42,18 +42,20 @@ class QueueController(
     @PostMapping("/{taskId}/state/complete")
     @Operation(summary = "작업 완료", description = "작업을 완료 상태로 전환한다.")
     fun complete(
+        @AuthenticationPrincipal user: CustomUserDetails,
         @PathVariable taskId: String,
     ): ResponseEntity<Void> {
-        queueService.completeTask(UUID.fromString(taskId))
+        queueService.completeTask(user.getId(), UUID.fromString(taskId))
         return ResponseEntity.ok().build()
     }
 
     @PostMapping("/{taskId}/state/fail")
     @Operation(summary = "작업 실패", description = "작업을 실패 상태로 전환한다.")
     fun fail(
+        @AuthenticationPrincipal user: CustomUserDetails,
         @PathVariable taskId: String,
     ): ResponseEntity<Void> {
-        queueService.failTask(UUID.fromString(taskId))
+        queueService.failTask(user.getId(), UUID.fromString(taskId))
         return ResponseEntity.ok().build()
     }
 
