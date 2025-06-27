@@ -49,9 +49,29 @@ class Task(
         this.updatedAt = LocalDateTime.now()
     }
 
-    fun enqueue() = status.enqueue(this)
-    fun start() = status.start(this)
-    fun complete() = status.complete(this)
-    fun fail() = status.fail(this)
-    fun retry() = status.retry(this)
+    fun enqueue() {
+        status.enqueue(this)
+        updatedAt = LocalDateTime.now()
+    }
+
+    fun start() {
+        status.start(this)
+        updatedAt = LocalDateTime.now()
+    }
+
+    fun complete() {
+        status.complete(this)
+        updatedAt = LocalDateTime.now()
+    }
+
+    fun fail() {
+        status.fail(this)
+        updatedAt = LocalDateTime.now()
+    }
+
+    fun retry() {
+        status.retry(this)
+        updatedAt = LocalDateTime.now()
+
+    }
 }
