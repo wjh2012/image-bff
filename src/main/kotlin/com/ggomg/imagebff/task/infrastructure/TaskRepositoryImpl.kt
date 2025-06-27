@@ -1,5 +1,6 @@
 package com.ggomg.imagebff.task.infrastructure
 
+import com.ggomg.imagebff.task.application.TaskLockingRepository
 import com.ggomg.imagebff.task.domain.Task
 import com.ggomg.imagebff.task.domain.TaskRepository
 import com.ggomg.imagebff.task.infrastructure.repository.TaskJpaRepository
@@ -11,7 +12,7 @@ import java.util.UUID
 @Repository
 class TaskRepositoryImpl(
     private val taskJpaRepository: TaskJpaRepository,
-) : TaskRepository {
+) : TaskRepository, TaskLockingRepository {
 
     override fun findById(id: UUID): Task? {
         val taskEntity = taskJpaRepository.findByIdOrNull(id)
@@ -40,5 +41,13 @@ class TaskRepositoryImpl(
     override fun delete(task: Task) {
         val taskEntity = TaskMapper.toEntity(task)
         taskJpaRepository.delete(taskEntity)
+    }
+
+    override fun findByUserIdAndIdForUpdate(
+        userId: UUID,
+        id: UUID
+    ): Task? {
+        return taskJpaRepository.reserveTaskForProcessing(userId, id)
+            ?.let { TaskMapper.toDomain(it) }
     }
 }
