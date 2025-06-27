@@ -27,7 +27,7 @@ class TaskRepositoryImpl(
         userId: UUID,
         id: UUID
     ): Task? {
-        val taskEntity = taskJpaRepository.findByUserIdAndIdNull(userId, id)
+        val taskEntity = taskJpaRepository.findByUserIdAndId(userId, id)
         return taskEntity?.let { TaskMapper.toDomain(taskEntity) }
     }
 

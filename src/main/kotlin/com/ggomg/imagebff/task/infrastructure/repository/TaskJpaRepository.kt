@@ -7,5 +7,5 @@ import java.util.UUID
 interface TaskJpaRepository : JpaRepository<TaskEntity, UUID> {
 
     fun findAllByUserId(userId: UUID): List<TaskEntity>
-    fun findByUserIdAndIdNull(userId: UUID, id: UUID): TaskEntity?
+    fun findByUserIdAndId(userId: UUID, id: UUID): TaskEntity?
 }
