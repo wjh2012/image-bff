@@ -7,6 +7,9 @@ import com.ggomg.imagebff.image.exception.ImageErrorCode
 import com.ggomg.imagebff.task.domain.Task
 import com.ggomg.imagebff.task.domain.TaskRepository
 import com.ggomg.imagebff.task.exception.TaskErrorCode
+import com.ggomg.imagebff.task.model.TaskImageResponse
+import com.ggomg.imagebff.task.model.TaskResponse
+import com.ggomg.imagebff.task.model.TasksResponse
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.UUID
@@ -26,6 +29,29 @@ class TaskService(
             updatedAt = LocalDateTime.now(),
         )
         taskRepository.save(task)
+    }
+
+    fun getAllTaskByUserId(userId: UUID): TasksResponse {
+        val tasks = taskRepository.findAllByUserId(userId)
+
+        val taskResponses = tasks.map { task ->
+            TaskResponse(
+                id = task.getId().toString(),
+                name = task.getName(),
+                status = task.getStatus().toString(),
+                createdAt = task.getCreatedAt(),
+                updatedAt = task.getUpdatedAt(),
+                images = task.getTaskImages().map { taskImage ->
+                    TaskImageResponse(
+                        id = taskImage.id.toString(),
+                        taskId = taskImage.taskId.toString(),
+                        imageId = taskImage.imageId.toString()
+                    )
+                }
+            )
+        }
+
+        return TasksResponse(taskResponses)
     }
 
     fun addImageToTask(userId: UUID, taskId: UUID, imageId: UUID) {

@@ -18,6 +18,11 @@ class TaskRepositoryImpl(
         return taskEntity?.let { TaskMapper.toDomain(taskEntity) }
     }
 
+    override fun findAllByUserId(userId: UUID): List<Task> {
+        val taskEntities = taskJpaRepository.findAllByUserId(userId)
+        return taskEntities.map { TaskMapper.toDomain(it) }
+    }
+
     override fun findByUserIdAndId(
         userId: UUID,
         id: UUID
