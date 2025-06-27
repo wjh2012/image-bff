@@ -34,7 +34,7 @@ class TaskController(
 
     @PatchMapping("/{taskId}")
     @Operation(summary = "작업명 수정", description = "작업 이름을 수정한다.")
-    fun updateTaskName(
+    fun updateTaskNameByUserAndId(
         @AuthenticationPrincipal user: CustomUserDetails,
         @PathVariable taskId: String,
         @RequestBody request: TaskNameChangeRequest
@@ -48,7 +48,7 @@ class TaskController(
 
     @DeleteMapping("/{taskId}")
     @Operation(summary = "작업 삭제", description = "작업을 삭제한다.")
-    fun deleteTask(
+    fun deleteTaskByUserAndId(
         @AuthenticationPrincipal user: CustomUserDetails,
         @PathVariable taskId: String,
     ) {
