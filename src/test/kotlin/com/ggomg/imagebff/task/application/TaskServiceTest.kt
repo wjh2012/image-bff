@@ -29,7 +29,7 @@ class TaskServiceTest {
 
     @Test
     fun `save는 task를 저장한다`() {
-        taskService.save(userId, "새 작업")
+        taskService.createTask(userId, "새 작업")
 
         verify { taskRepository.save(any()) }
     }
@@ -101,7 +101,7 @@ class TaskServiceTest {
 
         every { taskRepository.findByUserIdAndId(userId, taskId) } returns task
 
-        taskService.delete(userId, taskId)
+        taskService.deleteTaskByUserIdAndTaskId(userId, taskId)
 
         verify { taskRepository.delete(task) }
     }

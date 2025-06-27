@@ -17,7 +17,7 @@ class TaskService(
     private val imageRepository: ImageRepository,
 ) {
 
-    fun save(userId: UUID, taskName: String) {
+    fun createTask(userId: UUID, taskName: String) {
         val task = Task(
             id = Generators.timeBasedEpochGenerator().generate(),
             userId = userId,
@@ -57,7 +57,7 @@ class TaskService(
         taskRepository.save(task)
     }
 
-    fun delete(userId: UUID, taskId: UUID) {
+    fun deleteTaskByUserIdAndTaskId(userId: UUID, taskId: UUID) {
         val task = getTaskForUser(userId, taskId)
         taskRepository.delete(task)
     }

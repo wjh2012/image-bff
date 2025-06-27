@@ -29,7 +29,7 @@ class TaskController(
         @AuthenticationPrincipal user: CustomUserDetails,
         @RequestBody request: TaskCreateRequest
     ) {
-        taskService.save(userId = user.getId(), taskName = request.name)
+        taskService.createTask(userId = user.getId(), taskName = request.name)
     }
 
     @PatchMapping("/{taskId}")
@@ -52,7 +52,7 @@ class TaskController(
         @AuthenticationPrincipal user: CustomUserDetails,
         @PathVariable taskId: String,
     ) {
-        taskService.delete(
+        taskService.deleteTaskByUserIdAndTaskId(
             userId = user.getId(),
             taskId = UUID.fromString(taskId),
         )
