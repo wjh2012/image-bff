@@ -10,11 +10,13 @@ import com.ggomg.imagebff.task.exception.TaskErrorCode
 import com.ggomg.imagebff.task.model.TaskImageResponse
 import com.ggomg.imagebff.task.model.TaskResponse
 import com.ggomg.imagebff.task.model.TasksResponse
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
+@Transactional
 class TaskService(
     private val taskRepository: TaskRepository,
     private val imageRepository: ImageRepository,
