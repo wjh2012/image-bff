@@ -10,8 +10,8 @@ import com.ggomg.imagebff.task.exception.TaskErrorCode
 import com.ggomg.imagebff.task.model.TaskImageResponse
 import com.ggomg.imagebff.task.model.TaskResponse
 import com.ggomg.imagebff.task.model.TasksResponse
-import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.UUID
 
