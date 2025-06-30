@@ -24,6 +24,14 @@ spring:
     console:
       enabled: true
 
+  rabbitmq:
+    host: 192.168.45.131
+    port: 5672
+    username: admin
+    password: admin
+    listener:
+      simple:
+        acknowledge-mode: auto
 
   config:
     import:
@@ -39,3 +47,15 @@ minio:
   access-key: admin
   secret-key: adminadmin
   bucket: example-bucket
+
+rabbitmq:
+  image:
+    ocr:
+      exchange: image.request
+      routing-key: image.ocr.request
+    validation:
+      exchange: image.request
+      routing-key: image.validation.request
+    thumbnail:
+      exchange: image.request
+      routing-key: image.thumbnail.request

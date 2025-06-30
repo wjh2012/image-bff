@@ -37,6 +37,10 @@ dependencies {
     // minio
     implementation("io.minio:minio:8.5.17")
 
+    // rabbitmq
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+    testImplementation("org.springframework.amqp:spring-rabbit-test")
+
     // uuid
     implementation("com.fasterxml.uuid:java-uuid-generator:5.1.0")
 
