@@ -12,7 +12,6 @@ import io.minio.MinioClient
 import io.minio.http.Method
 import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
-import java.util.UUID
 
 private val logger = KotlinLogging.logger {}
 

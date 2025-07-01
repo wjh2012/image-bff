@@ -1,5 +1,6 @@
 package com.ggomg.imagebff.task.infrastructure.message
 
+import java.io.Serializable
 import java.util.UUID
 
 data class TaskImageEvent(

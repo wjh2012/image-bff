@@ -1,6 +1,7 @@
 package com.ggomg.imagebff.task.application
 
 import BusinessException
+import com.ggomg.imagebff.task.domain.TaskEventPublisher
 import com.ggomg.imagebff.task.domain.TaskRepository
 import com.ggomg.imagebff.task.exception.TaskErrorCode
 import jakarta.transaction.Transactional
@@ -12,6 +13,7 @@ import java.util.UUID
 class QueueService(
     private val taskLockingRepository: TaskLockingRepository,
     private val taskRepository: TaskRepository,
+    private val taskMessage: TaskEventPublisher,
 ) {
 
     fun enqueueTask(userId: UUID, taskId: UUID) {
@@ -19,6 +21,7 @@ class QueueService(
             ?: throw BusinessException(TaskErrorCode.TASK_NOT_FOUND)
         task.enqueue()
         taskRepository.save(task)
+        taskMessage.publishEnqueuedEvents(task)
     }
 
     fun startTask(userId: UUID, taskId: UUID) {
